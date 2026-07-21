@@ -2,20 +2,16 @@
 
 ## Current Position
 - **Active Milestone**: Milestone 2 (Items Database UI)
+- **Active Branch**: `feat/category-selector-bar`
 - **Active Phase**: Phase 2.2 (Category Filter Bar)
-- **Status**: Navigation Shell completed! Bottom Navigation Bar (Items, Heroes, Guides, Map) built and active. Awaiting user review.
+- **Status**: Component `CategorySelectorWidget` built with horizontal scrolling & category state management. Awaiting user review/approval on Android Emulator.
 
-## Decisions Log
-- Target Platform: Android Emulator (AVD)
-- State Management: Riverpod 2.x
-- Development Workflow: Micro-incremental (Component by Component) with Gatekeeper Approvals.
-- Navigation Architecture: IndexedStack for instant tab switching without reloading state.
-- Code style: Production clean (zero inline code comments), detailed concepts explained in text.
+## Git & Branching Strategy
+- Branch convention: `feat/*`, `chore/*`, `fix/*`, `docs/*`.
+- Workflow: Work on dedicated feature branch -> Approval by user -> Commit with Conventional Commits -> Merge to `main`.
 
-## Completed Components / Gates
-- [x] Gate 1: Project Setup & Dark Theme Baseline
-- [x] Gate 2.1: Top Header Component (`CorepunkHeaderWidget`)
-- [x] Gate 2.7 (Early): Bottom Navigation Bar (`MainNavigationPage` + `IndexedStack`)
+## Completed Commits
+- `feat(navigation): add corepunk dark theme, header and bottom navigation shell` (Merged into `main`)
 
 ## Pending Verification / Gates
 - Gate 2.2: User visual approval of Category Selector Bar (`CategorySelectorWidget`).
