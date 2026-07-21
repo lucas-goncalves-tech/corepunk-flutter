@@ -1,0 +1,2 @@
+GET
+	https://corepunk.help/api/items/by-category?page=1&size=25&filters={"profession":"","mastery":"","type":"","tier":"","quality":"","tags":[],"name":"","sort":"name:asc"}
