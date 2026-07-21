@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
-import 'features/items/presentation/pages/items_page.dart';
+import 'features/navigation/presentation/pages/main_navigation_page.dart';
 
 void main() {
   runApp(const CorepunkApp());
@@ -15,7 +15,7 @@ class CorepunkApp extends StatelessWidget {
       title: 'Corepunk Help',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const ItemsPage(),
+      home: const MainNavigationPage(),
     );
   }
 }
