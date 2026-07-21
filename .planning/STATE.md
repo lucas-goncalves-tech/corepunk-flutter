@@ -2,16 +2,22 @@
 
 ## Current Position
 - **Active Milestone**: Milestone 2 (Items Database UI)
-- **Active Branch**: `feat/category-selector-bar`
-- **Active Phase**: Phase 2.2 (Category Filter Bar)
-- **Status**: Component `CategorySelectorWidget` built with horizontal scrolling & category state management. Awaiting user review/approval on Android Emulator.
+- **Active Branch**: `feat/search-and-filter-bar`
+- **Active Phase**: Phase 2.3 (Search Input & Secondary Filters)
+- **Status**: Navigation Shell & Category Bar completed. Target platforms expanded to include Android & Windows 10/11 Desktop.
 
-## Git & Branching Strategy
-- Branch convention: `feat/*`, `chore/*`, `fix/*`, `docs/*`.
-- Workflow: Work on dedicated feature branch -> Approval by user -> Commit with Conventional Commits -> Merge to `main`.
+## Decisions Log
+- Target Platforms: Android Emulator (AVD) + Windows Desktop (Win 10/11)
+- UI Language: 100% pt-BR (Português Brasil)
+- State Management: Riverpod 2.x
+- Development Workflow: Micro-incremental (Component by Component) with explicit user approval before any git commit.
+- Layout Strategy: Responsive Design (Dynamic columns for mobile vs wide desktop screens).
 
-## Completed Commits
-- `feat(navigation): add corepunk dark theme, header and bottom navigation shell` (Merged into `main`)
+## Completed Components / Gates
+- [x] Gate 1: Project Setup & Dark Theme Baseline
+- [x] Gate 2.1: Top Header Component (`CorepunkHeaderWidget`)
+- [x] Gate 2.2: Category Selector Bar (`CategorySelectorWidget` in pt-BR)
+- [x] Gate 2.7 (Early): Bottom Navigation Bar (`MainNavigationPage` + `IndexedStack`)
 
 ## Pending Verification / Gates
-- Gate 2.2: User visual approval of Category Selector Bar (`CategorySelectorWidget`).
+- Gate 2.3: User visual approval of Search Bar & Secondary Filters (Quality & Tier).

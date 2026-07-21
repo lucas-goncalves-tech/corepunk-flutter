@@ -69,22 +69,22 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
               NavigationDestination(
                 icon: Icon(Icons.inventory_2_outlined),
                 selectedIcon: Icon(Icons.inventory_2),
-                label: 'Items',
+                label: 'Itens',
               ),
               NavigationDestination(
                 icon: Icon(Icons.shield_outlined),
                 selectedIcon: Icon(Icons.shield),
-                label: 'Heroes',
+                label: 'Heróis',
               ),
               NavigationDestination(
                 icon: Icon(Icons.menu_book_outlined),
                 selectedIcon: Icon(Icons.menu_book),
-                label: 'Guides',
+                label: 'Guias',
               ),
               NavigationDestination(
                 icon: Icon(Icons.map_outlined),
                 selectedIcon: Icon(Icons.map),
-                label: 'Map',
+                label: 'Mapa',
               ),
             ],
           ),

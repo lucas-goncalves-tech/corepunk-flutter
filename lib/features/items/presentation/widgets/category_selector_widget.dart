@@ -12,17 +12,17 @@ class CategorySelectorWidget extends StatelessWidget {
   });
 
   static const List<Map<String, dynamic>> categories = [
-    {'id': '', 'label': 'All', 'icon': Icons.grid_view_rounded},
-    {'id': 'weapon', 'label': 'Weapon', 'icon': Icons.sports_kabaddi_rounded},
-    {'id': 'artifact', 'label': 'Artifact', 'icon': Icons.hexagon_outlined},
-    {'id': 'chip', 'label': 'Chip', 'icon': Icons.memory_rounded},
-    {'id': 'rune', 'label': 'Rune', 'icon': Icons.polyline_rounded},
-    {'id': 'consumable', 'label': 'Consumable', 'icon': Icons.science_rounded},
-    {'id': 'resource', 'label': 'Resource', 'icon': Icons.inventory_2_outlined},
-    {'id': 'talent', 'label': 'Talent', 'icon': Icons.auto_awesome_rounded},
-    {'id': 'skin', 'label': 'Skin', 'icon': Icons.checkroom_rounded},
-    {'id': 'mount', 'label': 'Mount', 'icon': Icons.pets_rounded},
-    {'id': 'quest-item', 'label': 'Quest Item', 'icon': Icons.description_rounded},
+    {'id': '', 'label': 'Todos', 'icon': Icons.grid_view_rounded},
+    {'id': 'weapon', 'label': 'Armas', 'icon': Icons.sports_kabaddi_rounded},
+    {'id': 'artifact', 'label': 'Artefatos', 'icon': Icons.hexagon_outlined},
+    {'id': 'chip', 'label': 'Chips', 'icon': Icons.memory_rounded},
+    {'id': 'rune', 'label': 'Runas', 'icon': Icons.polyline_rounded},
+    {'id': 'consumable', 'label': 'Consumíveis', 'icon': Icons.science_rounded},
+    {'id': 'resource', 'label': 'Recursos', 'icon': Icons.inventory_2_outlined},
+    {'id': 'talent', 'label': 'Talentos', 'icon': Icons.auto_awesome_rounded},
+    {'id': 'skin', 'label': 'Skins', 'icon': Icons.checkroom_rounded},
+    {'id': 'mount', 'label': 'Montarias', 'icon': Icons.pets_rounded},
+    {'id': 'quest-item', 'label': 'Missões', 'icon': Icons.description_rounded},
   ];
 
   @override
@@ -31,12 +31,7 @@ class CategorySelectorWidget extends StatelessWidget {
       height: 52,
       decoration: const BoxDecoration(
         color: AppColors.background,
-        border: Border(
-          bottom: BorderSide(
-            color: AppColors.border,
-            width: 1.0,
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.border, width: 1.0)),
       ),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
@@ -81,7 +76,9 @@ class _CategoryChip extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : AppColors.card,
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.15)
+              : AppColors.card,
           borderRadius: AppColors.borderRadius,
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.border,
@@ -100,7 +97,9 @@ class _CategoryChip extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? AppColors.primary : AppColors.mutedForeground,
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.mutedForeground,
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               ),
