@@ -95,6 +95,9 @@ class CorepunkItemDetail {
   final String? professionLevel;
   final String? description;
   final String? descriptionEffect;
+  final String? archetype;
+  final String? sex;
+  final String? slot;
   final List<ItemStatInfo> stats;
   final List<IngredientItem> workbenchIngredients;
   final List<CraftRecipeInfo> synthesisRecipes;
@@ -112,6 +115,9 @@ class CorepunkItemDetail {
     this.professionLevel,
     this.description,
     this.descriptionEffect,
+    this.archetype,
+    this.sex,
+    this.slot,
     this.stats = const [],
     this.workbenchIngredients = const [],
     this.synthesisRecipes = const [],
@@ -166,6 +172,9 @@ class CorepunkItemDetail {
       professionLevel: json['professionLevel']?.toString(),
       description: json['description']?.toString(),
       descriptionEffect: json['descriptionEffect']?.toString(),
+      archetype: json['archetype']?.toString(),
+      sex: json['sex']?.toString(),
+      slot: json['slot']?.toString(),
       stats: rawStats,
       workbenchIngredients: rawIngredients,
       synthesisRecipes: recipes,

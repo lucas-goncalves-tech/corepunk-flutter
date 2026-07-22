@@ -10,6 +10,9 @@ class CorepunkItem {
   final String? mastery;
   final String? descriptionEffect;
   final String? description;
+  final String? archetype;
+  final String? sex;
+  final String? slot;
   final List<String> tags;
 
   const CorepunkItem({
@@ -24,6 +27,9 @@ class CorepunkItem {
     this.mastery,
     this.descriptionEffect,
     this.description,
+    this.archetype,
+    this.sex,
+    this.slot,
     this.tags = const [],
   });
 
@@ -55,6 +61,9 @@ class CorepunkItem {
       mastery: json['mastery']?.toString(),
       descriptionEffect: json['descriptionEffect']?.toString(),
       description: json['description']?.toString(),
+      archetype: json['archetype']?.toString(),
+      sex: json['sex']?.toString(),
+      slot: json['slot']?.toString(),
       tags: extractedTags,
     );
   }
