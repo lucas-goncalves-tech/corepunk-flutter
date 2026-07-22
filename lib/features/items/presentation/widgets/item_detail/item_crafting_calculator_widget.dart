@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../data/models/corepunk_item_detail.dart';
+import '../../../providers/ingredient_prices_provider.dart';
 
-class ItemCraftingCalculatorWidget extends StatefulWidget {
+class ItemCraftingCalculatorWidget extends ConsumerStatefulWidget {
   final CorepunkItemDetail item;
 
   const ItemCraftingCalculatorWidget({
@@ -11,13 +13,12 @@ class ItemCraftingCalculatorWidget extends StatefulWidget {
   });
 
   @override
-  State<ItemCraftingCalculatorWidget> createState() => _ItemCraftingCalculatorWidgetState();
+  ConsumerState<ItemCraftingCalculatorWidget> createState() => _ItemCraftingCalculatorWidgetState();
 }
 
-class _ItemCraftingCalculatorWidgetState extends State<ItemCraftingCalculatorWidget> {
+class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalculatorWidget> {
   int _selectedRecipeIndex = 0;
   int _craftQuantity = 1;
-  final Map<int, int> _unitGoldCosts = {};
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +26,7 @@ class _ItemCraftingCalculatorWidgetState extends State<ItemCraftingCalculatorWid
       return const SizedBox.shrink();
     }
 
+    final savedPrices = ref.watch(ingredientPricesProvider);
     final recipes = widget.item.synthesisRecipes;
     final activeRecipe = (recipes.isNotEmpty && _selectedRecipeIndex < recipes.length)
         ? recipes[_selectedRecipeIndex]
@@ -32,7 +34,7 @@ class _ItemCraftingCalculatorWidgetState extends State<ItemCraftingCalculatorWid
 
     int grandTotalGold = 0;
     for (final ing in activeRecipe.ingredients) {
-      final unitCost = _unitGoldCosts[ing.id] ?? 0;
+      final unitCost = savedPrices[ing.slug] ?? 0;
       grandTotalGold += (unitCost * ing.quantity * _craftQuantity);
     }
 
@@ -139,7 +141,7 @@ class _ItemCraftingCalculatorWidgetState extends State<ItemCraftingCalculatorWid
           ),
           const SizedBox(height: 12),
           ...activeRecipe.ingredients.map((ing) {
-            final unitCost = _unitGoldCosts[ing.id] ?? 0;
+            final unitCost = savedPrices[ing.slug] ?? 0;
             final subtotal = unitCost * ing.quantity * _craftQuantity;
 
             return Padding(
@@ -178,7 +180,9 @@ class _ItemCraftingCalculatorWidgetState extends State<ItemCraftingCalculatorWid
                   SizedBox(
                     width: 70,
                     height: 32,
-                    child: TextField(
+                    child: TextFormField(
+                      key: ValueKey('${ing.slug}_$unitCost'),
+                      initialValue: unitCost > 0 ? '$unitCost' : '',
                       keyboardType: TextInputType.number,
                       style: const TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold),
                       decoration: InputDecoration(
@@ -187,9 +191,8 @@ class _ItemCraftingCalculatorWidgetState extends State<ItemCraftingCalculatorWid
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
                       ),
                       onChanged: (val) {
-                        setState(() {
-                          _unitGoldCosts[ing.id] = int.tryParse(val) ?? 0;
-                        });
+                        final parsed = int.tryParse(val) ?? 0;
+                        ref.read(ingredientPricesProvider.notifier).setPrice(ing.slug, parsed);
                       },
                     ),
                   ),
