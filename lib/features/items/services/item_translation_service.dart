@@ -119,10 +119,10 @@ class ItemTranslationService {
         professionLevel: cached.professionLevel,
         description: cached.description,
         descriptionEffect: cached.descriptionEffect,
-        stats: cached.stats,
-        workbenchIngredients: cached.workbenchIngredients,
-        synthesisRecipes: cached.synthesisRecipes,
-        specialEffect: cached.specialEffect,
+        stats: original.stats,
+        workbenchIngredients: original.workbenchIngredients,
+        synthesisRecipes: original.synthesisRecipes,
+        specialEffect: cached.specialEffect ?? original.specialEffect,
       );
     }
 
@@ -130,25 +130,37 @@ class ItemTranslationService {
     if (diskJson != null && diskJson.isNotEmpty) {
       try {
         final decoded = jsonDecode(diskJson) as Map<String, dynamic>;
-        final diskDetail = CorepunkItemDetail.fromJson(decoded);
-        _memoryCache[cacheKey] = diskDetail;
-        return CorepunkItemDetail(
-          id: diskDetail.id,
-          name: diskDetail.name,
-          slug: diskDetail.slug,
+        final String cachedName = decoded['name'] ?? original.name;
+        final String cachedDesc = decoded['description'] ?? original.description ?? '';
+        final String cachedEffect = decoded['descriptionEffect'] ?? original.descriptionEffect ?? '';
+        final String cachedProf = decoded['profession'] ?? (original.profession != null ? translateProfession(original.profession!) : '');
+
+        final diskDetail = CorepunkItemDetail(
+          id: original.id,
+          name: cachedName,
+          slug: original.slug,
           quality: original.quality,
-          type: diskDetail.type,
-          tier: diskDetail.tier,
-          level: diskDetail.level,
-          profession: diskDetail.profession,
-          professionLevel: diskDetail.professionLevel,
-          description: diskDetail.description,
-          descriptionEffect: diskDetail.descriptionEffect,
-          stats: diskDetail.stats,
-          workbenchIngredients: diskDetail.workbenchIngredients,
-          synthesisRecipes: diskDetail.synthesisRecipes,
-          specialEffect: diskDetail.specialEffect,
+          type: original.type,
+          tier: original.tier,
+          level: original.level,
+          profession: cachedProf,
+          professionLevel: original.professionLevel,
+          description: cachedDesc,
+          descriptionEffect: cachedEffect,
+          stats: original.stats,
+          workbenchIngredients: original.workbenchIngredients,
+          synthesisRecipes: original.synthesisRecipes,
+          specialEffect: (cachedEffect.isNotEmpty)
+              ? SpecialEffectInfo(
+                  id: original.specialEffect?.id ?? 99,
+                  title: _cleanAndTranslateEffectText(original.specialEffect?.title ?? 'Chance On-hit'),
+                  descriptionEffect: cachedEffect,
+                )
+              : original.specialEffect,
         );
+
+        _memoryCache[cacheKey] = diskDetail;
+        return diskDetail;
       } catch (_) {}
     }
 

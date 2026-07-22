@@ -8,11 +8,20 @@ class StorageService {
   static bool _hasPendingPriceSave = false;
   static bool _hasPendingTranslationSave = false;
 
+  static const String _storageVersionKey = 'storage_version_v3';
+
   static final Map<String, double> _pricesMap = {};
   static final Map<String, String> _translationsMap = {};
 
   static Future<void> init() async {
     _prefs ??= await SharedPreferences.getInstance();
+
+    final currentVer = _prefs?.getString('app_storage_version');
+    if (currentVer != _storageVersionKey) {
+      await _prefs?.remove('saved_item_translations');
+      await _prefs?.setString('app_storage_version', _storageVersionKey);
+    }
+
     _loadPricesFromDisk();
     _loadTranslationsFromDisk();
   }
