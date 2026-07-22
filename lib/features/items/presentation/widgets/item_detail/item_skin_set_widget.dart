@@ -10,26 +10,53 @@ class ItemSkinSetWidget extends StatelessWidget {
     required this.item,
   });
 
-  static const List<Color> rarityColors = [
-    AppColors.rarityCommon,
-    AppColors.rarityUncommon,
-    AppColors.rarityRare,
-    AppColors.rarityEpic,
-  ];
+  static const List<String> _slugSlots = ['head', 'body', 'arms', 'belt', 'legs'];
 
-  static const List<String> setSlots = [
-    'Helm',
-    'Chest',
-    'Gloves',
-    'Pants',
-    'Boots',
-  ];
+  static const List<String> _qualities = ['common', 'uncommon', 'rare', 'epic'];
+
+  static const Map<String, Color> _qualityColors = {
+    'common': AppColors.rarityCommon,
+    'uncommon': AppColors.rarityUncommon,
+    'rare': AppColors.rarityRare,
+    'epic': AppColors.rarityEpic,
+  };
+
+  ({String setBase, String currentSlot, String color})? _parseSlug() {
+    final cleanSlug = item.slug.replaceAll(RegExp(r'-(common|uncommon|rare|epic)$'), '');
+    for (final slot in _slugSlots) {
+      final pattern = '-$slot-';
+      final idx = cleanSlug.lastIndexOf(pattern);
+      if (idx != -1) {
+        return (
+          setBase: cleanSlug.substring(0, idx),
+          currentSlot: slot,
+          color: cleanSlug.substring(idx + pattern.length),
+        );
+      }
+    }
+    return null;
+  }
+
+  String _skinImageUrl(String setBase, String slot, String color, String quality) {
+    final baseSlug = '$setBase-$slot-$color';
+    if (quality == 'common') {
+      return 'https://d2fwno52vggyhx.cloudfront.net/items/skin/$baseSlug.png';
+    }
+    return 'https://d2fwno52vggyhx.cloudfront.net/items/skin/$baseSlug-$quality.png';
+  }
+
+  String _capitalize(String? value) {
+    if (value == null || value.isEmpty) return 'Any';
+    return value[0].toUpperCase() + value.substring(1);
+  }
 
   @override
   Widget build(BuildContext context) {
     if (item.type.toLowerCase() != 'skin') {
       return const SizedBox.shrink();
     }
+
+    final parsed = _parseSlug();
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -52,75 +79,109 @@ class ItemSkinSetWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const Row(
-            children: [
-              Icon(Icons.accessibility_new_rounded, size: 16, color: AppColors.mutedForeground),
-              SizedBox(width: 6),
-              Text('Personagem: ', style: TextStyle(color: AppColors.mutedForeground, fontSize: 12)),
-              Text('Campeão', style: TextStyle(color: AppColors.cardForeground, fontSize: 12, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          const SizedBox(height: 4),
-          const Row(
-            children: [
-              Icon(Icons.male_rounded, size: 16, color: AppColors.mutedForeground),
-              SizedBox(width: 6),
-              Text('Sexo: ', style: TextStyle(color: AppColors.mutedForeground, fontSize: 12)),
-              Text('Masculino', style: TextStyle(color: AppColors.cardForeground, fontSize: 12, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          const SizedBox(height: 4),
-          const Row(
-            children: [
-              Icon(Icons.checkroom_rounded, size: 16, color: AppColors.mutedForeground),
-              SizedBox(width: 6),
-              Text('Slot: ', style: TextStyle(color: AppColors.mutedForeground, fontSize: 12)),
-              Text('Peitoral (Chest)', style: TextStyle(color: AppColors.cardForeground, fontSize: 12, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          const Divider(height: 24, color: AppColors.border),
-          const Text(
-            'CONJUNTO COMPLETO (COMPLETE SET):',
-            style: TextStyle(
-              color: AppColors.primary,
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
+          _buildInfoRow(Icons.accessibility_new_rounded, 'Personagem', _capitalize(item.archetype)),
+          _buildInfoRow(Icons.person_rounded, 'Sexo', _capitalize(item.sex)),
+          _buildInfoRow(Icons.checkroom_rounded, 'Slot', _capitalize(item.slot)),
+          if (parsed != null)
+            _buildInfoRow(Icons.color_lens_rounded, 'Cor', _capitalize(parsed.color)),
+          if (item.upgradable && parsed != null) ...[
+            const Divider(height: 24, color: AppColors.border),
+            _buildCompleteSetGrid(parsed.setBase, parsed.currentSlot, parsed.color),
+          ],
+          if (item.description != null && item.description!.isNotEmpty) ...[
+            const Divider(height: 24, color: AppColors.border),
+            Text(
+              item.description!,
+              style: const TextStyle(
+                color: AppColors.mutedForeground,
+                fontSize: 12,
+                fontStyle: FontStyle.italic,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          Column(
-            children: setSlots.map((slot) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: rarityColors.map((color) {
-                    return Container(
-                      width: 58,
-                      height: 58,
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: color, width: 2.0),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
-                        child: Image.network(
-                          item.imageUrl,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Icon(Icons.checkroom_rounded, color: color, size: 24),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              );
-            }).toList(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: AppColors.mutedForeground),
+          const SizedBox(width: 6),
+          Text('$label: ', style: const TextStyle(color: AppColors.mutedForeground, fontSize: 12)),
+          Text(
+            value,
+            style: const TextStyle(
+              color: AppColors.cardForeground,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCompleteSetGrid(String setBase, String currentSlot, String color) {
+    final currentQuality = item.quality.toLowerCase();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'CONJUNTO COMPLETO:',
+          style: TextStyle(
+            color: AppColors.primary,
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ..._slugSlots.map((slot) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 6.0),
+            child: Row(
+              children: _qualities.map((quality) {
+                final imageUrl = _skinImageUrl(setBase, slot, color, quality);
+                final isCurrentItem = slot == currentSlot && quality == currentQuality;
+                final borderColor = _qualityColors[quality] ?? AppColors.rarityCommon;
+
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                    child: AspectRatio(
+                      aspectRatio: 1.0,
+                      child: Opacity(
+                        opacity: isCurrentItem ? 0.45 : 1.0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: borderColor, width: 2.0),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: Image.network(
+                              imageUrl,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Icon(Icons.checkroom_rounded, color: borderColor, size: 24),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          );
+        }),
+      ],
     );
   }
 }

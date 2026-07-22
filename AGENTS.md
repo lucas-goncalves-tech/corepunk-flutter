@@ -12,7 +12,7 @@ This document serves as the primary orientation guide for AI agents and human de
 - **Framework**: Flutter (Dart 3)
 - **Target Platforms**: Android (AVD Emulator) & Windows Desktop (`.exe`)
 - **State Management**: Flutter Riverpod 2.x (`ProviderScope`, `FutureProvider.family`, `StateNotifierProvider`)
-- **API Endpoint**: `https://corepunk.help/api/items/by-category`
+- **API Endpoint (for Items tab)**: `https://corepunk.help/api/items/by-category`
 - **CDN Host**: `https://d2fwno52vggyhx.cloudfront.net/`
 - **Local Storage**: `shared_preferences` with 1500ms debounced disk writes (`StorageService`)
 
@@ -79,17 +79,20 @@ lib/
 ## 🛠️ Key Architectural Patterns & Conventions
 
 ### 1. Hybrid Translation Engine (`ItemTranslationService`)
+
 - Indexing key: `item.id.toString()` (shared across all 4 rarities for 0ms quality switches).
 - Pipeline: Manual Overrides -> Memory Cache (`_memoryCache`) -> Local Disk Storage (`StorageService`) -> Free Google Translate API.
 - RegEx replacement for game stat brackets (`[mcc]`, `[ap]`, `[wd]`, `[poison]`, `[cd]`).
 - Manual refetch button `(G)` protected by a 5-second anti-spam cooldown.
 
 ### 2. Crafting Gold Cost Calculator (`ingredientPricesProvider`)
+
 - Global `StateNotifierProvider` mapping `ingredientSlug` to `double` price.
 - Live cost updates across all open item modals.
 - Whole & decimal support (`12.5g`, `0,75g`) with clean `_formatGold` formatting.
 
 ### 3. Skin Set Logic (`ItemSkinSetWidget`)
+
 - Uses API boolean **`upgradable`**:
   - `upgradable == false`: Standalone single skin item -> `CONJUNTO COMPLETO` section is **HIDDEN**.
   - `upgradable == true`: Upgradable armor set -> `CONJUNTO COMPLETO` section is **SHOWN**.
@@ -100,7 +103,7 @@ lib/
 ## ⚠️ Strict Rules for AI Agents
 
 1. **Always run `flutter analyze` after EVERY code change**:
-   - Execute `C:\Users\Drummond\flutter\bin\flutter.bat analyze` via `run_command`.
+   - Execute `flutter analyze` via `run_command`.
    - Maintain 0 errors and 0 lint warnings at all times.
 
 2. **No Automatic `git push`**:

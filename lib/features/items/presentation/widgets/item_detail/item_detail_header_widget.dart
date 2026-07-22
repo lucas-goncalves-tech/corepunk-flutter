@@ -34,7 +34,7 @@ class ItemDetailHeaderWidget extends StatelessWidget {
 
   bool get _hasQualityVariations {
     final t = item.type.toLowerCase();
-    return t == 'weapon' || t == 'implant';
+    return t == 'weapon' || t == 'implant' || (t == 'skin' && item.upgradable);
   }
 
   @override
