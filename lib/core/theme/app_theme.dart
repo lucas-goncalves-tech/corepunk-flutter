@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// AppTheme builds the complete Flutter ThemeData using the Corepunk CSS tokens.
 abstract class AppTheme {
   static ThemeData get darkTheme {
     return ThemeData(
@@ -30,6 +29,8 @@ abstract class AppTheme {
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.background,
         foregroundColor: AppColors.foreground,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0.0,
         elevation: 0,
         centerTitle: false,
       ),

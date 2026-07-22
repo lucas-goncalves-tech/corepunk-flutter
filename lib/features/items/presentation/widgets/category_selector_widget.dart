@@ -14,7 +14,7 @@ class CategorySelectorWidget extends StatelessWidget {
   static const List<Map<String, dynamic>> categories = [
     {'id': '', 'label': 'Todos', 'icon': Icons.grid_view_rounded},
     {'id': 'weapon', 'label': 'Armas', 'icon': Icons.sports_kabaddi_rounded},
-    {'id': 'artifact', 'label': 'Artefatos', 'icon': Icons.hexagon_outlined},
+    {'id': 'implant', 'label': 'Artefatos', 'icon': Icons.hexagon_outlined},
     {'id': 'chip', 'label': 'Chips', 'icon': Icons.memory_rounded},
     {'id': 'rune', 'label': 'Runas', 'icon': Icons.polyline_rounded},
     {'id': 'consumable', 'label': 'Consumíveis', 'icon': Icons.science_rounded},
@@ -31,7 +31,12 @@ class CategorySelectorWidget extends StatelessWidget {
       height: 52,
       decoration: const BoxDecoration(
         color: AppColors.background,
-        border: Border(bottom: BorderSide(color: AppColors.border, width: 1.0)),
+        border: Border(
+          bottom: BorderSide(
+            color: AppColors.border,
+            width: 1.0,
+          ),
+        ),
       ),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
@@ -76,9 +81,7 @@ class _CategoryChip extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.15)
-              : AppColors.card,
+          color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : AppColors.card,
           borderRadius: AppColors.borderRadius,
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.border,
@@ -97,9 +100,7 @@ class _CategoryChip extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.mutedForeground,
+                color: isSelected ? AppColors.primary : AppColors.mutedForeground,
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               ),

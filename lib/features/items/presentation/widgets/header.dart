@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 
-class CorepunkHeaderWidget extends StatelessWidget
-    implements PreferredSizeWidget {
-  const CorepunkHeaderWidget({super.key});
+class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
+  const HeaderWidget({super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(60.0);
@@ -12,6 +11,8 @@ class CorepunkHeaderWidget extends StatelessWidget
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: AppColors.background,
+      surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0.0,
       titleSpacing: 16,
       elevation: 0,
       bottom: const PreferredSize(

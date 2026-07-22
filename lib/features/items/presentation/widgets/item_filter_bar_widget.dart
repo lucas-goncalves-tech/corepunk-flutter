@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class ItemFilterBarWidget extends StatelessWidget {
-  final String searchQuery;
+  final TextEditingController searchController;
   final String selectedQuality;
   final String selectedTier;
   final String selectedProfession;
@@ -16,7 +16,7 @@ class ItemFilterBarWidget extends StatelessWidget {
 
   const ItemFilterBarWidget({
     super.key,
-    required this.searchQuery,
+    required this.searchController,
     required this.selectedQuality,
     required this.selectedTier,
     required this.selectedProfession,
@@ -69,7 +69,7 @@ class ItemFilterBarWidget extends StatelessWidget {
   ];
 
   bool get hasActiveFilters =>
-      searchQuery.isNotEmpty ||
+      searchController.text.isNotEmpty ||
       selectedQuality.isNotEmpty ||
       selectedTier.isNotEmpty ||
       selectedProfession.isNotEmpty ||
@@ -91,15 +91,19 @@ class ItemFilterBarWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
+                  controller: searchController,
                   onChanged: onSearchChanged,
                   style: const TextStyle(color: AppColors.cardForeground, fontSize: 13),
                   decoration: InputDecoration(
                     hintText: 'Buscar item por nome...',
                     prefixIcon: const Icon(Icons.search_rounded, color: AppColors.mutedForeground, size: 18),
-                    suffixIcon: searchQuery.isNotEmpty
+                    suffixIcon: searchController.text.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.close_rounded, size: 16, color: AppColors.mutedForeground),
-                            onPressed: () => onSearchChanged(''),
+                            onPressed: () {
+                              searchController.clear();
+                              onSearchChanged('');
+                            },
                           )
                         : null,
                     contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),

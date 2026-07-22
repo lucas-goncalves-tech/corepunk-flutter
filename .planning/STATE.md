@@ -2,22 +2,15 @@
 
 ## Current Position
 - **Active Milestone**: Milestone 2 (Items Database UI)
-- **Active Branch**: `feat/search-and-filter-bar`
-- **Active Phase**: Phase 2.3 (Search Input & Secondary Filters)
-- **Status**: Navigation Shell & Category Bar completed. Target platforms expanded to include Android & Windows 10/11 Desktop.
+- **Active Branch**: `feat/item-card-component`
+- **Active Phase**: Phase 2.5 (Item Grid Body & API Riverpod Integration)
+- **Status**: Real Corepunk API (`GET /api/items/by-category`) integrated with Riverpod `FutureProvider.family` for automatic TanStack Query-style memory caching! Awaiting user review/approval on Android Emulator.
 
 ## Decisions Log
 - Target Platforms: Android Emulator (AVD) + Windows Desktop (Win 10/11)
 - UI Language: 100% pt-BR (Português Brasil)
-- State Management: Riverpod 2.x
-- Development Workflow: Micro-incremental (Component by Component) with explicit user approval before any git commit.
-- Layout Strategy: Responsive Design (Dynamic columns for mobile vs wide desktop screens).
-
-## Completed Components / Gates
-- [x] Gate 1: Project Setup & Dark Theme Baseline
-- [x] Gate 2.1: Top Header Component (`CorepunkHeaderWidget`)
-- [x] Gate 2.2: Category Selector Bar (`CategorySelectorWidget` in pt-BR)
-- [x] Gate 2.7 (Early): Bottom Navigation Bar (`MainNavigationPage` + `IndexedStack`)
+- State Management: Riverpod 2.x (`FutureProvider.family` + `ItemFilters` comparator for automatic cache keys).
+- HTTP Client: `http` package fetching from `https://corepunk.help/api/items/by-category`.
 
 ## Pending Verification / Gates
-- Gate 2.3: User visual approval of Search Bar & Secondary Filters (Quality & Tier).
+- Gate 2.5: User visual & functional approval of Real API Integration with Riverpod Cache.

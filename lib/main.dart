@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
 import 'features/navigation/presentation/pages/main_navigation_page.dart';
 
 void main() {
-  runApp(const CorepunkApp());
+  runApp(
+    const ProviderScope(
+      child: CorepunkApp(),
+    ),
+  );
 }
 
 class CorepunkApp extends StatelessWidget {
