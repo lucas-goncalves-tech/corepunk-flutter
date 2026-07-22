@@ -35,6 +35,7 @@ class ItemSkinSetWidget extends StatelessWidget {
         return 'Peitoral (Chest)';
       case 'hands':
       case 'gloves':
+      case 'arms':
         return 'Manoplas (Hands)';
       case 'legs':
       case 'pants':
@@ -77,14 +78,30 @@ class ItemSkinSetWidget extends StatelessWidget {
     }
   }
 
-  String _getSkinSlotUrl(String slug, String targetSlot) {
-    String cleanSlug = slug;
-    final currentSlotRegExp = RegExp(r'-(head|body|hands|legs|feet|helmet|chest|gloves|pants|boots)');
+  bool get _isSetItem {
+    final slug = item.slug.toLowerCase();
+    return slug.contains('battering-ram') ||
+        slug.contains('ashvyr') ||
+        slug.contains('warmonger') ||
+        slug.contains('champion-female') ||
+        slug.contains('champion-male') ||
+        slug.contains('bomber');
+  }
 
-    if (currentSlotRegExp.hasMatch(cleanSlug)) {
-      cleanSlug = cleanSlug.replaceAll(currentSlotRegExp, '-$targetSlot');
+  String _buildVariantUrl(String slug, String targetSlot, String variantColor) {
+    String cleanSlug = slug;
+    final slotRegExp = RegExp(r'-(head|body|hands|arms|legs|feet|helmet|chest|gloves|pants|boots)');
+    final colorRegExp = RegExp(r'-(yellow|grey|gray|green|blue|purple|gold)$');
+
+    cleanSlug = cleanSlug.replaceAll(colorRegExp, '');
+    if (slotRegExp.hasMatch(cleanSlug)) {
+      cleanSlug = cleanSlug.replaceAll(slotRegExp, '-$targetSlot');
     } else {
       cleanSlug = '$cleanSlug-$targetSlot';
+    }
+
+    if (variantColor.isNotEmpty) {
+      cleanSlug = '$cleanSlug-$variantColor';
     }
 
     return 'https://d2fwno52vggyhx.cloudfront.net/items/skin/$cleanSlug.png';
@@ -92,8 +109,15 @@ class ItemSkinSetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final qualities = const ['common', 'uncommon', 'rare', 'epic'];
-    final slots = const ['head', 'body', 'hands', 'legs', 'feet'];
+    final showSetGrid = _isSetItem;
+    final slots = const ['head', 'body', 'arms', 'legs', 'feet'];
+    final variants = const [
+      {'quality': 'common', 'color': 'grey'},
+      {'quality': 'uncommon', 'color': 'green'},
+      {'quality': 'rare', 'color': 'yellow'},
+      {'quality': 'epic', 'color': 'purple'},
+    ];
+
     final currentSlot = item.slot?.toLowerCase() ?? 'body';
 
     return Container(
@@ -149,86 +173,99 @@ class ItemSkinSetWidget extends StatelessWidget {
               ),
             ],
           ),
-          const Divider(height: 24, color: AppColors.border),
-          const Text(
-            'CONJUNTO COMPLETO (COMPLETE SET):',
-            style: TextStyle(
-              color: AppColors.primary,
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
+          if (showSetGrid) ...[
+            const Divider(height: 24, color: AppColors.border),
+            const Text(
+              'CONJUNTO COMPLETO (COMPLETE SET):',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          Column(
-            children: slots.map((slotName) {
-              final isCurrentSlotRow = (currentSlot == slotName ||
-                  (slotName == 'body' && currentSlot == 'chest') ||
-                  (slotName == 'head' && currentSlot == 'helmet') ||
-                  (slotName == 'hands' && currentSlot == 'gloves') ||
-                  (slotName == 'legs' && currentSlot == 'pants') ||
-                  (slotName == 'feet' && currentSlot == 'boots'));
+            const SizedBox(height: 12),
+            Column(
+              children: slots.map((slotName) {
+                final isCurrentSlotRow = (currentSlot == slotName ||
+                    (slotName == 'body' && (currentSlot == 'chest' || currentSlot == 'body')) ||
+                    (slotName == 'head' && (currentSlot == 'helmet' || currentSlot == 'head')) ||
+                    (slotName == 'arms' && (currentSlot == 'gloves' || currentSlot == 'hands' || currentSlot == 'arms')) ||
+                    (slotName == 'legs' && (currentSlot == 'pants' || currentSlot == 'legs')) ||
+                    (slotName == 'feet' && (currentSlot == 'boots' || currentSlot == 'feet')));
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: qualities.map((q) {
-                    final color = _getBorderColor(q);
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: variants.map((v) {
+                      final q = v['quality']!;
+                      final colorName = v['color']!;
+                      final color = _getBorderColor(q);
 
-                    String imgUrl;
-                    if (isCurrentSlotRow && q == item.quality.toLowerCase()) {
-                      imgUrl = item.imageUrl;
-                    } else {
-                      imgUrl = _getSkinSlotUrl(item.slug, slotName);
-                    }
+                      String imgUrl;
+                      if (isCurrentSlotRow && q == item.quality.toLowerCase()) {
+                        imgUrl = item.imageUrl;
+                      } else {
+                        imgUrl = _buildVariantUrl(item.slug, slotName, colorName);
+                      }
 
-                    return Container(
-                      width: 68,
-                      height: 68,
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: color, width: 1.5),
-                      ),
-                      child: Image.network(
-                        imgUrl,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          final altSlotName = (slotName == 'head')
-                              ? 'helmet'
-                              : (slotName == 'body')
-                                  ? 'chest'
-                                  : (slotName == 'hands')
-                                      ? 'gloves'
-                                      : (slotName == 'legs')
-                                          ? 'pants'
-                                          : 'boots';
-                          final altUrl = _getSkinSlotUrl(item.slug, altSlotName);
+                      return Container(
+                        width: 68,
+                        height: 68,
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: color, width: 1.5),
+                        ),
+                        child: Image.network(
+                          imgUrl,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            final altSlot = (slotName == 'head')
+                                ? 'helmet'
+                                : (slotName == 'body')
+                                    ? 'chest'
+                                    : (slotName == 'arms')
+                                        ? 'gloves'
+                                        : (slotName == 'legs')
+                                            ? 'pants'
+                                            : 'boots';
+                            final altUrl = _buildVariantUrl(item.slug, altSlot, colorName);
 
-                          return Image.network(
-                            altUrl,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: Colors.transparent,
-                                child: const Icon(
-                                  Icons.shield_outlined,
-                                  size: 18,
-                                  color: AppColors.border,
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    );
-                  }).toList(),
-                ),
-              );
-            }).toList(),
-          ),
+                            return Image.network(
+                              altUrl,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                final altColor = (colorName == 'grey') ? 'gray' : (colorName == 'yellow') ? 'gold' : colorName;
+                                final altColorUrl = _buildVariantUrl(item.slug, slotName, altColor);
+
+                                return Image.network(
+                                  altColorUrl,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: Colors.transparent,
+                                      child: const Icon(
+                                        Icons.shield_outlined,
+                                        size: 18,
+                                        color: AppColors.border,
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
         ],
       ),
     );
