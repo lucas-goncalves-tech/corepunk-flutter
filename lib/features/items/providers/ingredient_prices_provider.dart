@@ -1,21 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class IngredientPricesNotifier extends StateNotifier<Map<String, int>> {
+class IngredientPricesNotifier extends StateNotifier<Map<String, double>> {
   IngredientPricesNotifier() : super({});
 
-  void setPrice(String ingredientSlug, int price) {
+  void setPrice(String ingredientSlug, double price) {
     state = {
       ...state,
       ingredientSlug: price,
     };
   }
 
-  int getPrice(String ingredientSlug) {
-    return state[ingredientSlug] ?? 0;
+  double getPrice(String ingredientSlug) {
+    return state[ingredientSlug] ?? 0.0;
   }
 }
 
 final ingredientPricesProvider =
-    StateNotifierProvider<IngredientPricesNotifier, Map<String, int>>((ref) {
+    StateNotifierProvider<IngredientPricesNotifier, Map<String, double>>((ref) {
   return IngredientPricesNotifier();
 });

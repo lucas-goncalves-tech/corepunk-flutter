@@ -20,6 +20,13 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
   int _selectedRecipeIndex = 0;
   int _craftQuantity = 1;
 
+  String _formatGold(double amount) {
+    if (amount == amount.truncateToDouble()) {
+      return '${amount.toInt()}g';
+    }
+    return '${amount.toStringAsFixed(2).replaceAll(RegExp(r'\.?0+$'), '')}g';
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.item.workbenchIngredients.isEmpty) {
@@ -32,9 +39,9 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
         ? recipes[_selectedRecipeIndex]
         : CraftRecipeInfo(name: 'Bancada (Workbench)', ingredients: widget.item.workbenchIngredients);
 
-    int grandTotalGold = 0;
+    double grandTotalGold = 0.0;
     for (final ing in activeRecipe.ingredients) {
-      final unitCost = savedPrices[ing.slug] ?? 0;
+      final unitCost = savedPrices[ing.slug] ?? 0.0;
       grandTotalGold += (unitCost * ing.quantity * _craftQuantity);
     }
 
@@ -141,8 +148,11 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
           ),
           const SizedBox(height: 12),
           ...activeRecipe.ingredients.map((ing) {
-            final unitCost = savedPrices[ing.slug] ?? 0;
+            final unitCost = savedPrices[ing.slug] ?? 0.0;
             final subtotal = unitCost * ing.quantity * _craftQuantity;
+            final formattedInitial = (unitCost > 0.0)
+                ? ((unitCost == unitCost.truncateToDouble()) ? '${unitCost.toInt()}' : '$unitCost')
+                : '';
 
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -178,12 +188,12 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
                     style: const TextStyle(color: AppColors.mutedForeground, fontSize: 11),
                   ),
                   SizedBox(
-                    width: 70,
+                    width: 75,
                     height: 32,
                     child: TextFormField(
                       key: ValueKey(ing.slug),
-                      initialValue: unitCost > 0 ? '$unitCost' : '',
-                      keyboardType: TextInputType.number,
+                      initialValue: formattedInitial,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       style: const TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold),
                       decoration: InputDecoration(
                         hintText: '0g',
@@ -191,16 +201,17 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
                       ),
                       onChanged: (val) {
-                        final parsed = int.tryParse(val) ?? 0;
+                        final cleanVal = val.replaceAll(',', '.');
+                        final parsed = double.tryParse(cleanVal) ?? 0.0;
                         ref.read(ingredientPricesProvider.notifier).setPrice(ing.slug, parsed);
                       },
                     ),
                   ),
                   const SizedBox(width: 8),
                   SizedBox(
-                    width: 50,
+                    width: 60,
                     child: Text(
-                      '${subtotal}g',
+                      _formatGold(subtotal),
                       textAlign: TextAlign.right,
                       style: const TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold),
                     ),
@@ -237,7 +248,7 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
                   ],
                 ),
                 Text(
-                  'Total: ${grandTotalGold}g',
+                  'Total: ${_formatGold(grandTotalGold)}',
                   style: const TextStyle(color: AppColors.primary, fontSize: 14, fontWeight: FontWeight.bold),
                 ),
               ],
