@@ -14,14 +14,7 @@ class ItemDetailHeaderWidget extends StatelessWidget {
     required this.onQualitySelected,
   });
 
-  static const List<Map<String, dynamic>> qualities = [
-    {'id': 'common', 'label': 'Comum', 'color': AppColors.rarityCommon},
-    {'id': 'uncommon', 'label': 'Incomum', 'color': AppColors.rarityUncommon},
-    {'id': 'rare', 'label': 'Raro', 'color': AppColors.rarityRare},
-    {'id': 'epic', 'label': 'Épico', 'color': AppColors.rarityEpic},
-  ];
-
-  Color _getRarityColor(String quality) {
+  Color _getBorderColor(String quality) {
     switch (quality.toLowerCase()) {
       case 'uncommon':
         return AppColors.rarityUncommon;
@@ -37,24 +30,20 @@ class ItemDetailHeaderWidget extends StatelessWidget {
 
   bool get _hasQualityVariations {
     final t = item.type.toLowerCase();
-    return t == 'weapon' || t == 'implant' || t == 'chip' || t == 'rune';
+    return t == 'weapon' || t == 'implant';
   }
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = _getRarityColor(selectedQuality);
+    final qualities = const ['common', 'uncommon', 'rare', 'epic'];
+    final activeBorderColor = _getBorderColor(selectedQuality);
 
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: const BoxDecoration(
-        color: AppColors.card,
-        border: Border(
-          bottom: BorderSide(color: AppColors.border, width: 1.0),
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Column(
@@ -63,27 +52,28 @@ class ItemDetailHeaderWidget extends StatelessWidget {
                     Text(
                       item.name,
                       style: const TextStyle(
-                        color: AppColors.cardForeground,
+                        color: AppColors.foreground,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: activeColor.withValues(alpha: 0.15),
+                            color: activeBorderColor.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: activeColor),
+                            border: Border.all(color: activeBorderColor),
                           ),
                           child: Text(
                             selectedQuality.toUpperCase(),
                             style: TextStyle(
-                              color: activeColor,
+                              color: activeBorderColor,
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ),
@@ -101,77 +91,82 @@ class ItemDetailHeaderWidget extends StatelessWidget {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.close_rounded, color: AppColors.mutedForeground),
+                icon: const Icon(Icons.close, color: AppColors.mutedForeground),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          if (_hasQualityVariations)
-            Row(
+        ),
+        const SizedBox(height: 16),
+        if (_hasQualityVariations)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: qualities.map((q) {
-                final id = q['id'] as String;
-                final color = q['color'] as Color;
-                final isSelected = selectedQuality.toLowerCase() == id;
-                final variantUrl = item.getImageUrlForQuality(id);
+                final isSelected = q.toLowerCase() == selectedQuality.toLowerCase();
+                final baseRarityColor = _getBorderColor(q);
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                  child: InkWell(
-                    onTap: () => onQualitySelected(id),
-                    borderRadius: BorderRadius.circular(8),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
-                      width: 58,
-                      height: 58,
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isSelected ? color : AppColors.border,
-                          width: isSelected ? 2.5 : 1.0,
-                        ),
+                final borderColor = isSelected
+                    ? baseRarityColor
+                    : baseRarityColor.withValues(alpha: 0.35);
+
+                final borderWidth = isSelected ? 2.5 : 1.5;
+                final imageOpacity = isSelected ? 1.0 : 0.35;
+
+                return GestureDetector(
+                  onTap: () => onQualitySelected(q),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    padding: const EdgeInsets.all(6),
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? baseRarityColor.withValues(alpha: 0.12)
+                          : AppColors.card.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: borderColor,
+                        width: borderWidth,
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
-                        child: Image.network(
-                          variantUrl,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(Icons.shield_outlined, color: color, size: 24);
-                          },
-                        ),
+                    ),
+                    child: Opacity(
+                      opacity: imageOpacity,
+                      child: Image.network(
+                        item.getImageUrlForQuality(q),
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.broken_image_rounded, size: 28, color: AppColors.mutedForeground),
                       ),
                     ),
                   ),
                 );
               }).toList(),
-            )
-          else
-            Center(
-              child: Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: activeColor, width: 2.0),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    item.imageUrl,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(Icons.shield_outlined, color: activeColor, size: 32);
-                    },
-                  ),
-                ),
+            ),
+          )
+        else
+          Container(
+            padding: const EdgeInsets.all(8),
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              color: activeBorderColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: activeBorderColor,
+                width: 2.0,
               ),
             ),
-        ],
-      ),
+            child: Image.network(
+              item.imageUrl,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.broken_image_rounded, size: 36, color: AppColors.mutedForeground),
+            ),
+          ),
+      ],
     );
   }
 }
