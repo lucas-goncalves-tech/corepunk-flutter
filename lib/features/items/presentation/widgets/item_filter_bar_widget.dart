@@ -3,29 +3,43 @@ import '../../../../core/theme/app_colors.dart';
 
 class ItemFilterBarWidget extends StatelessWidget {
   final TextEditingController searchController;
+  final String itemType;
   final String selectedQuality;
   final String selectedTier;
   final String selectedProfession;
   final String selectedMastery;
+  final String selectedArchetype;
+  final String selectedSex;
+  final String selectedSlot;
   final ValueChanged<String> onSearchChanged;
   final ValueChanged<String> onQualityChanged;
   final ValueChanged<String> onTierChanged;
   final ValueChanged<String> onProfessionChanged;
   final ValueChanged<String> onMasteryChanged;
+  final ValueChanged<String> onArchetypeChanged;
+  final ValueChanged<String> onSexChanged;
+  final ValueChanged<String> onSlotChanged;
   final VoidCallback onResetFilters;
 
   const ItemFilterBarWidget({
     super.key,
     required this.searchController,
+    required this.itemType,
     required this.selectedQuality,
     required this.selectedTier,
     required this.selectedProfession,
     required this.selectedMastery,
+    required this.selectedArchetype,
+    required this.selectedSex,
+    required this.selectedSlot,
     required this.onSearchChanged,
     required this.onQualityChanged,
     required this.onTierChanged,
     required this.onProfessionChanged,
     required this.onMasteryChanged,
+    required this.onArchetypeChanged,
+    required this.onSexChanged,
+    required this.onSlotChanged,
     required this.onResetFilters,
   });
 
@@ -68,15 +82,43 @@ class ItemFilterBarWidget extends StatelessWidget {
     {'id': 'defender', 'label': 'Defensor'},
   ];
 
+  static const List<Map<String, String>> archetypes = [
+    {'id': '', 'label': 'Personagem: Qualquer'},
+    {'id': 'bomber', 'label': 'Bomber'},
+    {'id': 'champion', 'label': 'Champion'},
+    {'id': 'warmonger', 'label': 'Warmonger'},
+  ];
+
+  static const List<Map<String, String>> sexes = [
+    {'id': '', 'label': 'Sexo: Qualquer'},
+    {'id': 'male', 'label': 'Masculino'},
+    {'id': 'female', 'label': 'Feminino'},
+  ];
+
+  static const List<Map<String, String>> slots = [
+    {'id': '', 'label': 'Slot: Qualquer'},
+    {'id': 'helmet', 'label': 'Capacete'},
+    {'id': 'chest', 'label': 'Peito'},
+    {'id': 'gloves', 'label': 'Luvas'},
+    {'id': 'pants', 'label': 'Calças'},
+    {'id': 'boots', 'label': 'Botas'},
+    {'id': 'body', 'label': 'Corpo'},
+  ];
+
   bool get hasActiveFilters =>
       searchController.text.isNotEmpty ||
       selectedQuality.isNotEmpty ||
       selectedTier.isNotEmpty ||
       selectedProfession.isNotEmpty ||
-      selectedMastery.isNotEmpty;
+      selectedMastery.isNotEmpty ||
+      selectedArchetype.isNotEmpty ||
+      selectedSex.isNotEmpty ||
+      selectedSlot.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
+    final isSkin = itemType.toLowerCase() == 'skin';
+
     return Container(
       padding: const EdgeInsets.all(12.0),
       decoration: const BoxDecoration(
@@ -129,29 +171,49 @@ class ItemFilterBarWidget extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildFilterDropdown(
-                  value: selectedQuality,
-                  items: qualities,
-                  onChanged: onQualityChanged,
-                ),
-                const SizedBox(width: 8),
-                _buildFilterDropdown(
-                  value: selectedTier,
-                  items: tiers,
-                  onChanged: onTierChanged,
-                ),
-                const SizedBox(width: 8),
-                _buildFilterDropdown(
-                  value: selectedProfession,
-                  items: professions,
-                  onChanged: onProfessionChanged,
-                ),
-                const SizedBox(width: 8),
-                _buildFilterDropdown(
-                  value: selectedMastery,
-                  items: masteries,
-                  onChanged: onMasteryChanged,
-                ),
+                if (!isSkin) ...[
+                  _buildFilterDropdown(
+                    value: selectedQuality,
+                    items: qualities,
+                    onChanged: onQualityChanged,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterDropdown(
+                    value: selectedTier,
+                    items: tiers,
+                    onChanged: onTierChanged,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterDropdown(
+                    value: selectedProfession,
+                    items: professions,
+                    onChanged: onProfessionChanged,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterDropdown(
+                    value: selectedMastery,
+                    items: masteries,
+                    onChanged: onMasteryChanged,
+                  ),
+                ] else ...[
+                  _buildFilterDropdown(
+                    value: selectedArchetype,
+                    items: archetypes,
+                    onChanged: onArchetypeChanged,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterDropdown(
+                    value: selectedSex,
+                    items: sexes,
+                    onChanged: onSexChanged,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterDropdown(
+                    value: selectedSlot,
+                    items: slots,
+                    onChanged: onSlotChanged,
+                  ),
+                ],
               ],
             ),
           ),

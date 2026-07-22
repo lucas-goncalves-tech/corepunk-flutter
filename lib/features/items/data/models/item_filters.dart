@@ -7,6 +7,9 @@ class ItemFilters {
   final String profession;
   final String mastery;
   final String name;
+  final String archetype;
+  final String sex;
+  final String slot;
   final int page;
   final int size;
 
@@ -17,6 +20,9 @@ class ItemFilters {
     this.profession = '',
     this.mastery = '',
     this.name = '',
+    this.archetype = '',
+    this.sex = '',
+    this.slot = '',
     this.page = 1,
     this.size = 25,
   });
@@ -28,6 +34,9 @@ class ItemFilters {
     String? profession,
     String? mastery,
     String? name,
+    String? archetype,
+    String? sex,
+    String? slot,
     int? page,
     int? size,
   }) {
@@ -38,6 +47,9 @@ class ItemFilters {
       profession: profession ?? this.profession,
       mastery: mastery ?? this.mastery,
       name: name ?? this.name,
+      archetype: archetype ?? this.archetype,
+      sex: sex ?? this.sex,
+      slot: slot ?? this.slot,
       page: page ?? this.page,
       size: size ?? this.size,
     );
@@ -52,6 +64,9 @@ class ItemFilters {
       'quality': quality,
       'tags': [],
       'name': name,
+      'archetype': archetype,
+      'sex': sex,
+      'slot': slot,
       'sort': 'name:asc',
     };
     return jsonEncode(map);
@@ -67,6 +82,9 @@ class ItemFilters {
         other.profession == profession &&
         other.mastery == mastery &&
         other.name == name &&
+        other.archetype == archetype &&
+        other.sex == sex &&
+        other.slot == slot &&
         other.page == page &&
         other.size == size;
   }
@@ -80,6 +98,9 @@ class ItemFilters {
       profession,
       mastery,
       name,
+      archetype,
+      sex,
+      slot,
       page,
       size,
     );
