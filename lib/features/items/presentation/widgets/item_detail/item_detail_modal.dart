@@ -150,125 +150,129 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
   @override
   Widget build(BuildContext context) {
     final rawDetail = _buildRawDetail();
+    final keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.85,
-      minChildSize: 0.5,
-      maxChildSize: 0.95,
-      builder: (context, scrollController) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: AppColors.background,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          ),
-          child: FutureBuilder<CorepunkItemDetail>(
-            future: _translationFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return _buildGlassmorphismLoader();
-              }
+    return Padding(
+      padding: EdgeInsets.only(bottom: keyboardPadding),
+      child: DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) {
+          return Container(
+            decoration: const BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            child: FutureBuilder<CorepunkItemDetail>(
+              future: _translationFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return _buildGlassmorphismLoader();
+                }
 
-              final detail = snapshot.data ?? rawDetail;
+                final detail = snapshot.data ?? rawDetail;
 
-              return Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.border,
-                      borderRadius: BorderRadius.circular(2),
+                return Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.border,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
-                  ),
-                  ItemDetailHeaderWidget(
-                    item: detail,
-                    selectedQuality: _selectedQuality,
-                    onQualitySelected: _onQualityChanged,
-                  ),
-                  Expanded(
-                    child: ListView(
-                      controller: scrollController,
-                      padding: const EdgeInsets.all(16.0),
-                      children: [
-                        if (detail.type == 'skin') ItemSkinSetWidget(item: detail),
-                        if (detail.type != 'skin' && (detail.stats.isNotEmpty || detail.specialEffect != null))
-                          ItemStatsWidget(item: detail),
-                        if (detail.workbenchIngredients.isNotEmpty && detail.type != 'skin')
-                          ItemCraftingCalculatorWidget(item: detail),
-                        if (detail.profession != null && detail.profession!.isNotEmpty) ...[
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 8.0),
-                            padding: const EdgeInsets.all(16.0),
-                            decoration: BoxDecoration(
-                              color: AppColors.card,
-                              borderRadius: AppColors.borderRadius,
-                              border: Border.all(color: AppColors.border),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'PROFISSÃO:',
-                                  style: TextStyle(
-                                    color: AppColors.primary,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  'Especialização: ${detail.profession!}',
-                                  style: const TextStyle(color: AppColors.cardForeground, fontSize: 12),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                        if (detail.description != null && detail.description!.isNotEmpty) ...[
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 8.0),
-                            padding: const EdgeInsets.all(16.0),
-                            decoration: BoxDecoration(
-                              color: AppColors.card,
-                              borderRadius: AppColors.borderRadius,
-                              border: Border.all(color: AppColors.border),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'DESCRIÇÃO / LORE:',
-                                  style: TextStyle(
-                                    color: AppColors.primary,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  detail.description!,
-                                  style: const TextStyle(
-                                    color: AppColors.mutedForeground,
-                                    fontSize: 12,
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ],
+                    ItemDetailHeaderWidget(
+                      item: detail,
+                      selectedQuality: _selectedQuality,
+                      onQualitySelected: _onQualityChanged,
                     ),
-                  ),
-                ],
-              );
-            },
-          ),
-        );
-      },
+                    Expanded(
+                      child: ListView(
+                        controller: scrollController,
+                        padding: const EdgeInsets.all(16.0),
+                        children: [
+                          if (detail.type == 'skin') ItemSkinSetWidget(item: detail),
+                          if (detail.type != 'skin' && (detail.stats.isNotEmpty || detail.specialEffect != null))
+                            ItemStatsWidget(item: detail),
+                          if (detail.workbenchIngredients.isNotEmpty && detail.type != 'skin')
+                            ItemCraftingCalculatorWidget(item: detail),
+                          if (detail.profession != null && detail.profession!.isNotEmpty) ...[
+                            Container(
+                              margin: const EdgeInsets.symmetric(vertical: 8.0),
+                              padding: const EdgeInsets.all(16.0),
+                              decoration: BoxDecoration(
+                                color: AppColors.card,
+                                borderRadius: AppColors.borderRadius,
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'PROFISSÃO:',
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    'Especialização: ${detail.profession!}',
+                                    style: const TextStyle(color: AppColors.cardForeground, fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                          if (detail.description != null && detail.description!.isNotEmpty) ...[
+                            Container(
+                              margin: const EdgeInsets.symmetric(vertical: 8.0),
+                              padding: const EdgeInsets.all(16.0),
+                              decoration: BoxDecoration(
+                                color: AppColors.card,
+                                borderRadius: AppColors.borderRadius,
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'DESCRIÇÃO / LORE:',
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    detail.description!,
+                                    style: const TextStyle(
+                                      color: AppColors.mutedForeground,
+                                      fontSize: 12,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 

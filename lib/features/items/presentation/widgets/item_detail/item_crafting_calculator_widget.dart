@@ -181,7 +181,7 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
                     width: 70,
                     height: 32,
                     child: TextFormField(
-                      key: ValueKey('${ing.slug}_$unitCost'),
+                      key: ValueKey(ing.slug),
                       initialValue: unitCost > 0 ? '$unitCost' : '',
                       keyboardType: TextInputType.number,
                       style: const TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold),
