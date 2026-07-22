@@ -103,10 +103,27 @@ class ItemTranslationService {
   }
 
   static Future<CorepunkItemDetail> translateItemDetail(CorepunkItemDetail original) async {
-    final cacheKey = '${original.id}_${original.quality}';
+    final cacheKey = original.id.toString();
 
     if (_memoryCache.containsKey(cacheKey)) {
-      return _memoryCache[cacheKey]!;
+      final cached = _memoryCache[cacheKey]!;
+      return CorepunkItemDetail(
+        id: cached.id,
+        name: cached.name,
+        slug: cached.slug,
+        quality: original.quality,
+        type: cached.type,
+        tier: cached.tier,
+        level: cached.level,
+        profession: cached.profession,
+        professionLevel: cached.professionLevel,
+        description: cached.description,
+        descriptionEffect: cached.descriptionEffect,
+        stats: cached.stats,
+        workbenchIngredients: cached.workbenchIngredients,
+        synthesisRecipes: cached.synthesisRecipes,
+        specialEffect: cached.specialEffect,
+      );
     }
 
     final diskJson = StorageService.getTranslation(cacheKey);
@@ -115,7 +132,23 @@ class ItemTranslationService {
         final decoded = jsonDecode(diskJson) as Map<String, dynamic>;
         final diskDetail = CorepunkItemDetail.fromJson(decoded);
         _memoryCache[cacheKey] = diskDetail;
-        return diskDetail;
+        return CorepunkItemDetail(
+          id: diskDetail.id,
+          name: diskDetail.name,
+          slug: diskDetail.slug,
+          quality: original.quality,
+          type: diskDetail.type,
+          tier: diskDetail.tier,
+          level: diskDetail.level,
+          profession: diskDetail.profession,
+          professionLevel: diskDetail.professionLevel,
+          description: diskDetail.description,
+          descriptionEffect: diskDetail.descriptionEffect,
+          stats: diskDetail.stats,
+          workbenchIngredients: diskDetail.workbenchIngredients,
+          synthesisRecipes: diskDetail.synthesisRecipes,
+          specialEffect: diskDetail.specialEffect,
+        );
       } catch (_) {}
     }
 

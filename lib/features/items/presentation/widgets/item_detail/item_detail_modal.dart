@@ -49,7 +49,6 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
   void _onQualityChanged(String newQuality) {
     setState(() {
       _selectedQuality = newQuality;
-      _initTranslation();
     });
   }
 
@@ -174,7 +173,24 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
                     return _buildGlassmorphismLoader();
                   }
 
-                  final detail = snapshot.data ?? rawDetail;
+                  final translatedBase = snapshot.data ?? rawDetail;
+                  final detail = CorepunkItemDetail(
+                    id: translatedBase.id,
+                    name: translatedBase.name,
+                    slug: translatedBase.slug,
+                    quality: _selectedQuality,
+                    type: translatedBase.type,
+                    tier: translatedBase.tier,
+                    level: translatedBase.level,
+                    profession: translatedBase.profession,
+                    professionLevel: translatedBase.professionLevel,
+                    description: translatedBase.description,
+                    descriptionEffect: translatedBase.descriptionEffect,
+                    stats: translatedBase.stats,
+                    workbenchIngredients: translatedBase.workbenchIngredients,
+                    synthesisRecipes: translatedBase.synthesisRecipes,
+                    specialEffect: translatedBase.specialEffect,
+                  );
 
                   return Column(
                     children: [
