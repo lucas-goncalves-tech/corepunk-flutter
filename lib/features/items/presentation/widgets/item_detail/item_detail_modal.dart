@@ -32,15 +32,28 @@ class ItemDetailModal extends StatefulWidget {
 
 class _ItemDetailModalState extends State<ItemDetailModal> {
   late String _selectedQuality;
+  late Future<CorepunkItemDetail> _translationFuture;
 
   @override
   void initState() {
     super.initState();
     _selectedQuality = widget.itemSummary.quality;
+    _initTranslation();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  void _initTranslation() {
+    final rawDetail = _buildRawDetail();
+    _translationFuture = ItemTranslationService.translateItemDetail(rawDetail);
+  }
+
+  void _onQualityChanged(String newQuality) {
+    setState(() {
+      _selectedQuality = newQuality;
+      _initTranslation();
+    });
+  }
+
+  CorepunkItemDetail _buildRawDetail() {
     final stats = <ItemStatInfo>[];
     if (widget.itemSummary.tags.contains('as')) {
       stats.add(const ItemStatInfo(id: 1, type: 'as', min: 0.7, max: 1.2));
@@ -110,7 +123,7 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
       ));
     }
 
-    final rawDetail = CorepunkItemDetail(
+    return CorepunkItemDetail(
       id: widget.itemSummary.id,
       name: widget.itemSummary.name,
       slug: widget.itemSummary.slug,
@@ -132,6 +145,11 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
             )
           : null,
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final rawDetail = _buildRawDetail();
 
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
@@ -144,7 +162,7 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
             borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
           ),
           child: FutureBuilder<CorepunkItemDetail>(
-            future: ItemTranslationService.translateItemDetail(rawDetail),
+            future: _translationFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return _buildGlassmorphismLoader();
@@ -166,9 +184,7 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
                   ItemDetailHeaderWidget(
                     item: detail,
                     selectedQuality: _selectedQuality,
-                    onQualitySelected: (q) {
-                      setState(() => _selectedQuality = q);
-                    },
+                    onQualitySelected: _onQualityChanged,
                   ),
                   Expanded(
                     child: ListView(
