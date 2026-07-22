@@ -8,7 +8,7 @@ class StorageService {
   static bool _hasPendingPriceSave = false;
   static bool _hasPendingTranslationSave = false;
 
-  static const String _storageVersionKey = 'storage_version_v3';
+  static const String _storageVersionKey = 'storage_version_v4';
 
   static final Map<String, double> _pricesMap = {};
   static final Map<String, String> _translationsMap = {};
