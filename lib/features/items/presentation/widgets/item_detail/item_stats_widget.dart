@@ -193,6 +193,28 @@ class ItemStatsWidget extends StatelessWidget {
               ),
             ),
           ],
+          if (item.description != null && item.description!.isNotEmpty) ...[
+            const Divider(height: 20, color: AppColors.border),
+            const Text(
+              'DESCRIÇÃO / LORE:',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              item.description!,
+              style: const TextStyle(
+                color: AppColors.mutedForeground,
+                fontSize: 12,
+                fontStyle: FontStyle.italic,
+                height: 1.4,
+              ),
+            ),
+          ],
         ],
       ),
     );

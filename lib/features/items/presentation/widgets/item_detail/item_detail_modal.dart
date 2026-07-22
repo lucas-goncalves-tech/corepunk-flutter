@@ -261,7 +261,7 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
                           padding: const EdgeInsets.all(16.0),
                           children: [
                             if (detail.type == 'skin') ItemSkinSetWidget(item: detail),
-                            if (detail.type != 'skin' && (detail.stats.isNotEmpty || detail.specialEffect != null))
+                            if (detail.type != 'skin' && (detail.stats.isNotEmpty || detail.specialEffect != null || (detail.description != null && detail.description!.isNotEmpty)))
                               ItemStatsWidget(item: detail),
                             if (detail.workbenchIngredients.isNotEmpty && detail.type != 'skin')
                               ItemCraftingCalculatorWidget(item: detail),
@@ -290,40 +290,6 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
                                     Text(
                                       'Especialização: ${detail.profession!}',
                                       style: const TextStyle(color: AppColors.cardForeground, fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                            if (detail.description != null && detail.description!.isNotEmpty) ...[
-                              Container(
-                                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                                padding: const EdgeInsets.all(16.0),
-                                decoration: BoxDecoration(
-                                  color: AppColors.card,
-                                  borderRadius: AppColors.borderRadius,
-                                  border: Border.all(color: AppColors.border),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'DESCRIÇÃO / LORE:',
-                                      style: TextStyle(
-                                        color: AppColors.primary,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      detail.description!,
-                                      style: const TextStyle(
-                                        color: AppColors.mutedForeground,
-                                        fontSize: 12,
-                                        fontStyle: FontStyle.italic,
-                                      ),
                                     ),
                                   ],
                                 ),
