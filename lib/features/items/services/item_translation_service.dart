@@ -5,28 +5,52 @@ import '../data/models/corepunk_item_detail.dart';
 class ItemTranslationService {
   static final Map<String, CorepunkItemDetail> _memoryCache = {};
 
-  static final Map<String, String> _termDictionary = {
-    'Chance On-hit': 'Chance ao Atingir',
-    'On-ability use': 'Ao usar habilidade',
-    'Weapon Damage': 'Dano de Arma',
-    'Magic Damage': 'Dano Mágico',
-    'Physical Damage': 'Dano Físico',
-    'Poison': 'Veneno',
-    'armor': 'Armadura',
-    'ap': 'Poder de Ataque',
-    'sp': 'Poder Mágico',
-    'as': 'Velocidade de Ataque',
-    'wd': 'Dano de Arma',
-    'mpen': 'Penetração Mágica',
-    'cd': 'Tempo de Recarga',
-  };
-
   static final Map<String, Map<String, String>> _manualOverrides = {
     '203430': {
       'name': 'Picada Ácida',
       'description': 'A Manopla Picada Ácida é uma ferramenta de combate corpo a corpo mortal, incorporando um toque venenoso ao seu design.',
     },
   };
+
+  static String _cleanAndTranslateEffectText(String input) {
+    if (input.trim().isEmpty) return input;
+    String text = input;
+
+    final Map<String, String> phrases = {
+      'Chance On-hit': 'Chance ao Atingir',
+      'On-ability use': 'Ao usar habilidade',
+      'Your attacks have a': 'Seus ataques têm de',
+      'chance to apply': 'chance de aplicar',
+      'Each stack deals': 'Cada acúmulo causa',
+      'per second over': 'por segundo durante',
+      'seconds': 'segundos',
+      'Can stack up to': 'Pode acumular até',
+      'times': 'vezes',
+    };
+
+    phrases.forEach((en, pt) {
+      text = text.replaceAll(en, pt);
+    });
+
+    final Map<String, String> bracketTags = {
+      r'\[ap\]': 'Poder de Ataque',
+      r'\[wd\]': 'Dano de Arma',
+      r'\[md\]': 'Dano Mágico',
+      r'\[sp\]': 'Poder Mágico',
+      r'\[armor\]': 'Armadura',
+      r'\[poison\]': 'Veneno',
+      r'\[cd\]': 'Recarga',
+      r'\[as\]': 'Velocidade de Ataque',
+      r'\[hp\]': 'Vida',
+      r'\[mp\]': 'Mana',
+    };
+
+    bracketTags.forEach((pattern, replacement) {
+      text = text.replaceAll(RegExp(pattern), replacement);
+    });
+
+    return text;
+  }
 
   static Future<String> _translateTextApi(String input) async {
     if (input.trim().isEmpty) return input;
@@ -73,15 +97,11 @@ class ItemTranslationService {
       if (original.description != null && original.description!.isNotEmpty) {
         translatedDescription = await _translateTextApi(original.description!);
       }
-      if (original.descriptionEffect != null && original.descriptionEffect!.isNotEmpty) {
-        translatedDescriptionEffect = await _translateTextApi(original.descriptionEffect!);
-      }
     }
 
-    _termDictionary.forEach((en, pt) {
-      translatedDescriptionEffect = translatedDescriptionEffect.replaceAll(en, pt);
-      translatedDescriptionEffect = translatedDescriptionEffect.replaceAll('[$en]', pt);
-    });
+    if (original.descriptionEffect != null && original.descriptionEffect!.isNotEmpty) {
+      translatedDescriptionEffect = _cleanAndTranslateEffectText(original.descriptionEffect!);
+    }
 
     final translatedDetail = CorepunkItemDetail(
       id: original.id,
@@ -101,7 +121,7 @@ class ItemTranslationService {
       specialEffect: (original.specialEffect != null)
           ? SpecialEffectInfo(
               id: original.specialEffect!.id,
-              title: _termDictionary[original.specialEffect!.title] ?? original.specialEffect!.title,
+              title: _cleanAndTranslateEffectText(original.specialEffect!.title),
               descriptionEffect: translatedDescriptionEffect,
             )
           : null,
