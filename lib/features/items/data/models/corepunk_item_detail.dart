@@ -91,6 +91,7 @@ class CorepunkItemDetail {
   final String type;
   final int tier;
   final int level;
+  final bool upgradable;
   final String? profession;
   final String? professionLevel;
   final String? description;
@@ -111,6 +112,7 @@ class CorepunkItemDetail {
     required this.type,
     required this.tier,
     required this.level,
+    this.upgradable = false,
     this.profession,
     this.professionLevel,
     this.description,
@@ -168,6 +170,7 @@ class CorepunkItemDetail {
       type: json['type']?.toString().toLowerCase() ?? '',
       tier: (json['tier'] is num) ? (json['tier'] as num).toInt() : 1,
       level: (json['level'] is num) ? (json['level'] as num).toInt() : 1,
+      upgradable: json['upgradable'] == true,
       profession: json['profession']?.toString(),
       professionLevel: json['professionLevel']?.toString(),
       description: json['description']?.toString(),

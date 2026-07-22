@@ -6,6 +6,7 @@ class CorepunkItem {
   final String type;
   final int tier;
   final int level;
+  final bool upgradable;
   final String? profession;
   final String? mastery;
   final String? descriptionEffect;
@@ -23,6 +24,7 @@ class CorepunkItem {
     required this.type,
     required this.tier,
     required this.level,
+    this.upgradable = false,
     this.profession,
     this.mastery,
     this.descriptionEffect,
@@ -57,6 +59,7 @@ class CorepunkItem {
       type: json['type']?.toString().toLowerCase() ?? '',
       tier: (json['tier'] is num) ? (json['tier'] as num).toInt() : 1,
       level: (json['level'] is num) ? (json['level'] as num).toInt() : 1,
+      upgradable: json['upgradable'] == true,
       profession: json['profession']?.toString(),
       mastery: json['mastery']?.toString(),
       descriptionEffect: json['descriptionEffect']?.toString(),

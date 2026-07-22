@@ -78,16 +78,6 @@ class ItemSkinSetWidget extends StatelessWidget {
     }
   }
 
-  bool get _isSetItem {
-    final slug = item.slug.toLowerCase();
-    return slug.contains('battering-ram') ||
-        slug.contains('ashvyr') ||
-        slug.contains('warmonger') ||
-        slug.contains('champion-female') ||
-        slug.contains('champion-male') ||
-        slug.contains('bomber');
-  }
-
   String _buildVariantUrl(String slug, String targetSlot, String variantColor) {
     String cleanSlug = slug;
     final slotRegExp = RegExp(r'-(head|body|hands|arms|legs|feet|helmet|chest|gloves|pants|boots)');
@@ -109,7 +99,7 @@ class ItemSkinSetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showSetGrid = _isSetItem;
+    final showSetGrid = item.upgradable;
     final slots = const ['head', 'body', 'arms', 'legs', 'feet'];
     final variants = const [
       {'quality': 'common', 'color': 'grey'},
