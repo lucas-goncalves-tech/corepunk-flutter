@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/services/storage_service.dart';
@@ -24,6 +25,14 @@ class CorepunkApp extends StatelessWidget {
       title: 'Corepunk Help',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        dragDevices: {
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.touch,
+          PointerDeviceKind.stylus,
+          PointerDeviceKind.unknown,
+        },
+      ),
       home: const MainNavigationPage(),
     );
   }
