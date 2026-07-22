@@ -58,16 +58,16 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
       stats.add(const ItemStatInfo(id: 5, type: 'ap', min: 20.0, max: 40.0));
     }
 
-    List<IngredientItem> ingredients = [];
+    List<IngredientItem> workbenchIngredients = [];
     if (widget.itemSummary.type == 'weapon') {
-      ingredients = const [
+      workbenchIngredients = const [
         IngredientItem(id: 101, name: 'Receita de Armaria', quantity: 1, type: 'consumable', slug: 'recipe-weaponsmithing'),
         IngredientItem(id: 102, name: 'Lingote Meteórico', quantity: 3, type: 'resource', slug: 'meteoric-ingot'),
         IngredientItem(id: 103, name: 'Nugget de Titânio', quantity: 1, type: 'resource', slug: 'titanium-nugget'),
         IngredientItem(id: 104, name: 'Casco Verde', quantity: 1, type: 'resource', slug: 'green-shell'),
       ];
     } else if (widget.itemSummary.type == 'implant') {
-      ingredients = const [
+      workbenchIngredients = const [
         IngredientItem(id: 201, name: 'Receita de Construção', quantity: 1, type: 'consumable', slug: 'recipe-construction'),
         IngredientItem(id: 202, name: 'Mel de Sangue', quantity: 2, type: 'resource', slug: 'blood-honey'),
         IngredientItem(id: 203, name: 'Líquido de Thermium', quantity: 1, type: 'resource', slug: 'thermium-liquidum'),
@@ -75,13 +75,37 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
     }
 
     final recipes = <CraftRecipeInfo>[];
-    if (ingredients.isNotEmpty) {
-      recipes.add(CraftRecipeInfo(name: 'Bancada (Workbench)', ingredients: ingredients));
+    if (workbenchIngredients.isNotEmpty) {
+      recipes.add(CraftRecipeInfo(
+        name: 'Bancada (Workbench)',
+        ingredients: workbenchIngredients,
+      ));
+
       recipes.add(CraftRecipeInfo(
         name: 'Melhorado (Upgraded)',
         ingredients: [
-          ...ingredients.take(2),
-          const IngredientItem(id: 205, name: 'Kit de Upgrade', quantity: 1, type: 'resource', slug: 'overclock-kit'),
+          ...workbenchIngredients.take(2),
+          const IngredientItem(
+            id: 301,
+            name: 'Kit de Upgrade de Item',
+            quantity: 1,
+            type: 'resource',
+            slug: 'adept-item-upgrade-kit-t1',
+          ),
+        ],
+      ));
+
+      recipes.add(CraftRecipeInfo(
+        name: 'Overclockado (Overclocked)',
+        ingredients: [
+          ...workbenchIngredients.take(2),
+          const IngredientItem(
+            id: 302,
+            name: 'Kit de Upgrade de Mestre',
+            quantity: 1,
+            type: 'resource',
+            slug: 'master-item-upgrade-kit-t2',
+          ),
         ],
       ));
     }
@@ -98,7 +122,7 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
       descriptionEffect: widget.itemSummary.descriptionEffect,
       description: widget.itemSummary.description,
       stats: stats,
-      workbenchIngredients: ingredients,
+      workbenchIngredients: workbenchIngredients,
       synthesisRecipes: recipes,
       specialEffect: (widget.itemSummary.descriptionEffect != null && widget.itemSummary.descriptionEffect!.isNotEmpty)
           ? SpecialEffectInfo(
