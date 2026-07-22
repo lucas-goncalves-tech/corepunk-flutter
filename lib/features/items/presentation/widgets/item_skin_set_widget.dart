@@ -25,7 +25,7 @@ class ItemSkinSetWidget extends StatelessWidget {
   }
 
   String _formatSlot(String? rawSlot) {
-    if (rawSlot == null || rawSlot.isEmpty) return 'Peça Única';
+    if (rawSlot == null || rawSlot.isEmpty) return 'Peça de Armadura';
     switch (rawSlot.toLowerCase()) {
       case 'helmet':
       case 'head':
@@ -77,30 +77,24 @@ class ItemSkinSetWidget extends StatelessWidget {
     }
   }
 
-  String _extractSetPrefix(String slug) {
-    final clean = slug.replaceAll(RegExp(r'-(common|uncommon|rare|epic)$'), '');
-    return clean.replaceAll(RegExp(r'-(head|body|hands|legs|feet|helmet|chest|gloves|pants|boots)$'), '');
-  }
+  String _getSkinSlotUrl(String slug, String targetSlot) {
+    String cleanSlug = slug;
+    final currentSlotRegExp = RegExp(r'-(head|body|hands|legs|feet|helmet|chest|gloves|pants|boots)');
 
-  String _getSkinImageUrl(String prefix, String slot, String quality) {
-    final baseSlug = '$prefix-$slot';
-    if (quality.toLowerCase() == 'common') {
-      return 'https://d2fwno52vggyhx.cloudfront.net/items/skin/$baseSlug.png';
+    if (currentSlotRegExp.hasMatch(cleanSlug)) {
+      cleanSlug = cleanSlug.replaceAll(currentSlotRegExp, '-$targetSlot');
+    } else {
+      cleanSlug = '$cleanSlug-$targetSlot';
     }
-    return 'https://d2fwno52vggyhx.cloudfront.net/items/skin/$baseSlug-${quality.toLowerCase()}.png';
+
+    return 'https://d2fwno52vggyhx.cloudfront.net/items/skin/$cleanSlug.png';
   }
 
   @override
   Widget build(BuildContext context) {
-    final prefix = _extractSetPrefix(item.slug);
     final qualities = const ['common', 'uncommon', 'rare', 'epic'];
-
-    final rawSlot = item.slot?.toLowerCase() ?? '';
-    final isHeadSlot = rawSlot == 'head' || rawSlot == 'helmet';
-
-    final slots = isHeadSlot
-        ? const ['head', 'body', 'hands', 'legs', 'feet']
-        : const ['head', 'body', 'hands', 'legs', 'feet'];
+    final slots = const ['head', 'body', 'hands', 'legs', 'feet'];
+    final currentSlot = item.slot?.toLowerCase() ?? 'body';
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -168,19 +162,26 @@ class ItemSkinSetWidget extends StatelessWidget {
           const SizedBox(height: 12),
           Column(
             children: slots.map((slotName) {
+              final isCurrentSlotRow = (currentSlot == slotName ||
+                  (slotName == 'body' && currentSlot == 'chest') ||
+                  (slotName == 'head' && currentSlot == 'helmet') ||
+                  (slotName == 'hands' && currentSlot == 'gloves') ||
+                  (slotName == 'legs' && currentSlot == 'pants') ||
+                  (slotName == 'feet' && currentSlot == 'boots'));
+
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: qualities.map((q) {
                     final color = _getBorderColor(q);
-                    final isCurrentItemSlot = (rawSlot.contains(slotName) ||
-                        (slotName == 'head' && isHeadSlot) ||
-                        (slotName == 'body' && rawSlot == 'chest'));
 
-                    final imgUrl = isCurrentItemSlot
-                        ? item.getImageUrlForQuality(q)
-                        : _getSkinImageUrl(prefix, slotName, q);
+                    String imgUrl;
+                    if (isCurrentSlotRow && q == item.quality.toLowerCase()) {
+                      imgUrl = item.imageUrl;
+                    } else {
+                      imgUrl = _getSkinSlotUrl(item.slug, slotName);
+                    }
 
                     return Container(
                       width: 68,
@@ -195,10 +196,7 @@ class ItemSkinSetWidget extends StatelessWidget {
                         imgUrl,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
-                          if (isCurrentItemSlot) {
-                            return const Icon(Icons.checkroom_rounded, size: 24, color: AppColors.mutedForeground);
-                          }
-                          final altSlot = (slotName == 'head')
+                          final altSlotName = (slotName == 'head')
                               ? 'helmet'
                               : (slotName == 'body')
                                   ? 'chest'
@@ -207,17 +205,17 @@ class ItemSkinSetWidget extends StatelessWidget {
                                       : (slotName == 'legs')
                                           ? 'pants'
                                           : 'boots';
-                          final altImgUrl = _getSkinImageUrl(prefix, altSlot, q);
+                          final altUrl = _getSkinSlotUrl(item.slug, altSlotName);
 
                           return Image.network(
-                            altImgUrl,
+                            altUrl,
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
                                 color: Colors.transparent,
                                 child: const Icon(
                                   Icons.shield_outlined,
-                                  size: 20,
+                                  size: 18,
                                   color: AppColors.border,
                                 ),
                               );
