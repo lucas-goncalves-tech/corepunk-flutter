@@ -46,8 +46,23 @@ class ItemStatsWidget extends StatelessWidget {
     }
   }
 
+  int get _chipSlotsCount {
+    switch (item.quality.toLowerCase()) {
+      case 'epic':
+        return 3;
+      case 'rare':
+        return 2;
+      case 'uncommon':
+      case 'common':
+      default:
+        return 1;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final chipSlots = _chipSlotsCount;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       padding: const EdgeInsets.all(16.0),
@@ -102,6 +117,34 @@ class ItemStatsWidget extends StatelessWidget {
                         color: AppColors.mutedForeground,
                         fontSize: 13,
                       ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            const Divider(height: 20, color: AppColors.border),
+          ],
+          if (item.type.toLowerCase() == 'weapon' || item.type.toLowerCase() == 'implant') ...[
+            const Text(
+              'ATRIBUTOS SECUNDÁRIOS (SECONDARY STATS):',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...List.generate(chipSlots, (index) {
+              return const Padding(
+                padding: EdgeInsets.only(bottom: 4.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.memory_rounded, size: 14, color: AppColors.primary),
+                    SizedBox(width: 6),
+                    Text(
+                      'Slot de Chip Básico (Basic chip slot)',
+                      style: TextStyle(color: AppColors.cardForeground, fontSize: 12),
                     ),
                   ],
                 ),
