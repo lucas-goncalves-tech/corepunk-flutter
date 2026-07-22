@@ -24,6 +24,59 @@ class ItemSkinSetWidget extends StatelessWidget {
     }
   }
 
+  String _formatSlot(String? rawSlot) {
+    if (rawSlot == null || rawSlot.isEmpty) return 'Peça Única';
+    switch (rawSlot.toLowerCase()) {
+      case 'helmet':
+      case 'head':
+        return 'Capacete (Head)';
+      case 'body':
+      case 'chest':
+        return 'Peitoral (Chest)';
+      case 'hands':
+      case 'gloves':
+        return 'Manoplas (Hands)';
+      case 'legs':
+      case 'pants':
+        return 'Pernas (Legs)';
+      case 'feet':
+      case 'boots':
+        return 'Botas (Feet)';
+      default:
+        return rawSlot;
+    }
+  }
+
+  String _formatArchetype(String? raw) {
+    if (raw == null || raw.isEmpty || raw.toLowerCase() == 'any') return 'Todos os Campeões';
+    switch (raw.toLowerCase()) {
+      case 'champion':
+        return 'Campeão';
+      case 'warmonger':
+        return 'Belicista';
+      case 'bomber':
+        return 'Bombardeiro';
+      case 'ranger':
+        return 'Patrulheiro';
+      case 'defender':
+        return 'Defensor';
+      default:
+        return raw;
+    }
+  }
+
+  String _formatSex(String? raw) {
+    if (raw == null || raw.isEmpty || raw.toLowerCase() == 'any') return 'Ambos (Unissex)';
+    switch (raw.toLowerCase()) {
+      case 'male':
+        return 'Masculino';
+      case 'female':
+        return 'Feminino';
+      default:
+        return raw;
+    }
+  }
+
   String _extractSetPrefix(String slug) {
     final clean = slug.replaceAll(RegExp(r'-(common|uncommon|rare|epic)$'), '');
     return clean.replaceAll(RegExp(r'-(head|body|hands|legs|feet|helmet|chest|gloves|pants|boots)$'), '');
@@ -41,7 +94,13 @@ class ItemSkinSetWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final prefix = _extractSetPrefix(item.slug);
     final qualities = const ['common', 'uncommon', 'rare', 'epic'];
-    final slots = const ['head', 'body', 'hands', 'legs', 'feet'];
+
+    final rawSlot = item.slot?.toLowerCase() ?? '';
+    final isHeadSlot = rawSlot == 'head' || rawSlot == 'helmet';
+
+    final slots = isHeadSlot
+        ? const ['head', 'body', 'hands', 'legs', 'feet']
+        : const ['head', 'body', 'hands', 'legs', 'feet'];
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -69,7 +128,7 @@ class ItemSkinSetWidget extends StatelessWidget {
               const Icon(Icons.accessibility_new_rounded, size: 14, color: AppColors.mutedForeground),
               const SizedBox(width: 6),
               Text(
-                'Personagem: ${item.archetype ?? "Campeão"}',
+                'Personagem: ${_formatArchetype(item.archetype)}',
                 style: const TextStyle(color: AppColors.cardForeground, fontSize: 12),
               ),
             ],
@@ -80,7 +139,7 @@ class ItemSkinSetWidget extends StatelessWidget {
               const Icon(Icons.person_outline_rounded, size: 14, color: AppColors.mutedForeground),
               const SizedBox(width: 6),
               Text(
-                'Sexo: ${item.sex ?? "Masculino"}',
+                'Sexo: ${_formatSex(item.sex)}',
                 style: const TextStyle(color: AppColors.cardForeground, fontSize: 12),
               ),
             ],
@@ -91,7 +150,7 @@ class ItemSkinSetWidget extends StatelessWidget {
               const Icon(Icons.checkroom_rounded, size: 14, color: AppColors.mutedForeground),
               const SizedBox(width: 6),
               Text(
-                'Slot: ${item.slot ?? "Peitoral (Chest)"}',
+                'Slot: ${_formatSlot(item.slot)}',
                 style: const TextStyle(color: AppColors.cardForeground, fontSize: 12),
               ),
             ],
@@ -115,7 +174,13 @@ class ItemSkinSetWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: qualities.map((q) {
                     final color = _getBorderColor(q);
-                    final imgUrl = _getSkinImageUrl(prefix, slotName, q);
+                    final isCurrentItemSlot = (rawSlot.contains(slotName) ||
+                        (slotName == 'head' && isHeadSlot) ||
+                        (slotName == 'body' && rawSlot == 'chest'));
+
+                    final imgUrl = isCurrentItemSlot
+                        ? item.getImageUrlForQuality(q)
+                        : _getSkinImageUrl(prefix, slotName, q);
 
                     return Container(
                       width: 68,
@@ -130,6 +195,9 @@ class ItemSkinSetWidget extends StatelessWidget {
                         imgUrl,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
+                          if (isCurrentItemSlot) {
+                            return const Icon(Icons.checkroom_rounded, size: 24, color: AppColors.mutedForeground);
+                          }
                           final altSlot = (slotName == 'head')
                               ? 'helmet'
                               : (slotName == 'body')
@@ -145,11 +213,13 @@ class ItemSkinSetWidget extends StatelessWidget {
                             altImgUrl,
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) {
-                              return Image.network(
-                                item.getImageUrlForQuality(q),
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const Icon(Icons.checkroom_rounded, size: 24, color: AppColors.mutedForeground),
+                              return Container(
+                                color: Colors.transparent,
+                                child: const Icon(
+                                  Icons.shield_outlined,
+                                  size: 20,
+                                  color: AppColors.border,
+                                ),
                               );
                             },
                           );
