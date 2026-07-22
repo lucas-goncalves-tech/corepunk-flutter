@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../../core/services/storage_service.dart';
 import '../data/models/corepunk_item_detail.dart';
 
 class ItemTranslationService {
@@ -103,8 +104,19 @@ class ItemTranslationService {
 
   static Future<CorepunkItemDetail> translateItemDetail(CorepunkItemDetail original) async {
     final cacheKey = '${original.id}_${original.quality}';
+
     if (_memoryCache.containsKey(cacheKey)) {
       return _memoryCache[cacheKey]!;
+    }
+
+    final diskJson = StorageService.getTranslation(cacheKey);
+    if (diskJson != null && diskJson.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(diskJson) as Map<String, dynamic>;
+        final diskDetail = CorepunkItemDetail.fromJson(decoded);
+        _memoryCache[cacheKey] = diskDetail;
+        return diskDetail;
+      } catch (_) {}
     }
 
     final String itemIdStr = original.id.toString();
@@ -157,6 +169,22 @@ class ItemTranslationService {
     );
 
     _memoryCache[cacheKey] = translatedDetail;
+
+    final jsonMap = {
+      'id': translatedDetail.id,
+      'name': translatedDetail.name,
+      'slug': translatedDetail.slug,
+      'quality': translatedDetail.quality,
+      'type': translatedDetail.type,
+      'tier': translatedDetail.tier,
+      'level': translatedDetail.level,
+      'profession': translatedDetail.profession,
+      'professionLevel': translatedDetail.professionLevel,
+      'description': translatedDetail.description,
+      'descriptionEffect': translatedDetail.descriptionEffect,
+    };
+    StorageService.saveTranslationDebounced(cacheKey, jsonEncode(jsonMap));
+
     return translatedDetail;
   }
 }

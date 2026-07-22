@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/services/storage_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/navigation/presentation/pages/main_navigation_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await StorageService.init();
+
   runApp(
     const ProviderScope(
       child: CorepunkApp(),
