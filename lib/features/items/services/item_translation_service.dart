@@ -36,17 +36,12 @@ class ItemTranslationService {
     final Map<String, String> phrases = {
       'Chance On-hit': 'Chance ao Atingir',
       'On-ability use': 'Ao usar habilidade',
-      'Your attacks have a': 'Seus ataques têm',
-      'chance to apply': 'chance de aplicar',
-      'Each stack deals': 'Cada acúmulo causa',
-      'per second over': 'por segundo durante',
-      'seconds': 'segundos',
-      'second': 'segundo',
-      'Can stack up to': 'Pode acumular até',
-      'times': 'vezes',
+      'Increases': 'Aumenta',
       'Increase': 'Aumenta',
       'by': 'em',
       'Duration:': 'Duração:',
+      'seconds': 'segundos',
+      'second': 'segundo',
     };
 
     phrases.forEach((en, pt) {
@@ -127,10 +122,10 @@ class ItemTranslationService {
       if (original.description != null && original.description!.isNotEmpty) {
         translatedDescription = await _translateTextApi(original.description!);
       }
-    }
-
-    if (original.descriptionEffect != null && original.descriptionEffect!.isNotEmpty) {
-      translatedDescriptionEffect = _cleanAndTranslateEffectText(original.descriptionEffect!);
+      if (original.descriptionEffect != null && original.descriptionEffect!.isNotEmpty) {
+        final apiTranslated = await _translateTextApi(original.descriptionEffect!);
+        translatedDescriptionEffect = _cleanAndTranslateEffectText(apiTranslated);
+      }
     }
 
     final String translatedProfession = original.profession != null
