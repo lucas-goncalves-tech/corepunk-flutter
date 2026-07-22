@@ -34,6 +34,9 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
   late String _selectedQuality;
   late Future<CorepunkItemDetail> _translationFuture;
 
+  bool _isRefetchingTranslation = false;
+  DateTime? _lastRefetchTime;
+
   @override
   void initState() {
     super.initState();
@@ -41,15 +44,57 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
     _initTranslation();
   }
 
-  void _initTranslation() {
+  void _initTranslation({bool forceRefetch = false}) {
     final rawDetail = _buildRawDetail();
-    _translationFuture = ItemTranslationService.translateItemDetail(rawDetail);
+    _translationFuture = ItemTranslationService.translateItemDetail(rawDetail, forceRefetch: forceRefetch);
   }
 
   void _onQualityChanged(String newQuality) {
     setState(() {
       _selectedQuality = newQuality;
     });
+  }
+
+  Future<void> _handleManualRefetchTranslation() async {
+    if (_isRefetchingTranslation) return;
+
+    if (_lastRefetchTime != null) {
+      final elapsed = DateTime.now().difference(_lastRefetchTime!).inSeconds;
+      if (elapsed < 5) {
+        final remaining = 5 - elapsed;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Aguarde $remaining segundo(s) antes de traduzir novamente.'),
+            duration: const Duration(seconds: 2),
+            backgroundColor: AppColors.popover,
+          ),
+        );
+        return;
+      }
+    }
+
+    setState(() {
+      _isRefetchingTranslation = true;
+      _lastRefetchTime = DateTime.now();
+      _initTranslation(forceRefetch: true);
+    });
+
+    try {
+      await _translationFuture;
+    } catch (_) {}
+
+    if (mounted) {
+      setState(() {
+        _isRefetchingTranslation = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Tradução recarregada com sucesso!'),
+          duration: Duration(seconds: 2),
+          backgroundColor: AppColors.card,
+        ),
+      );
+    }
   }
 
   CorepunkItemDetail _buildRawDetail() {
@@ -207,6 +252,8 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
                         item: detail,
                         selectedQuality: _selectedQuality,
                         onQualitySelected: _onQualityChanged,
+                        onRefetchTranslation: _handleManualRefetchTranslation,
+                        isRefetching: _isRefetchingTranslation,
                       ),
                       Expanded(
                         child: ListView(

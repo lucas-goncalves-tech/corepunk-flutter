@@ -51,7 +51,7 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'COREPUNK MOBILE',
+          'COREPUNK DATABASE',
           style: TextStyle(
             color: AppColors.primary,
             fontSize: 15,

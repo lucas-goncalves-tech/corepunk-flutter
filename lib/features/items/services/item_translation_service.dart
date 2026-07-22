@@ -102,66 +102,68 @@ class ItemTranslationService {
     return input;
   }
 
-  static Future<CorepunkItemDetail> translateItemDetail(CorepunkItemDetail original) async {
+  static Future<CorepunkItemDetail> translateItemDetail(CorepunkItemDetail original, {bool forceRefetch = false}) async {
     final cacheKey = original.id.toString();
 
-    if (_memoryCache.containsKey(cacheKey)) {
-      final cached = _memoryCache[cacheKey]!;
-      return CorepunkItemDetail(
-        id: cached.id,
-        name: cached.name,
-        slug: cached.slug,
-        quality: original.quality,
-        type: cached.type,
-        tier: cached.tier,
-        level: cached.level,
-        profession: cached.profession,
-        professionLevel: cached.professionLevel,
-        description: cached.description,
-        descriptionEffect: cached.descriptionEffect,
-        stats: original.stats,
-        workbenchIngredients: original.workbenchIngredients,
-        synthesisRecipes: original.synthesisRecipes,
-        specialEffect: cached.specialEffect ?? original.specialEffect,
-      );
-    }
-
-    final diskJson = StorageService.getTranslation(cacheKey);
-    if (diskJson != null && diskJson.isNotEmpty) {
-      try {
-        final decoded = jsonDecode(diskJson) as Map<String, dynamic>;
-        final String cachedName = decoded['name'] ?? original.name;
-        final String cachedDesc = decoded['description'] ?? original.description ?? '';
-        final String cachedEffect = decoded['descriptionEffect'] ?? original.descriptionEffect ?? '';
-        final String cachedProf = decoded['profession'] ?? (original.profession != null ? translateProfession(original.profession!) : '');
-
-        final diskDetail = CorepunkItemDetail(
-          id: original.id,
-          name: cachedName,
-          slug: original.slug,
+    if (!forceRefetch) {
+      if (_memoryCache.containsKey(cacheKey)) {
+        final cached = _memoryCache[cacheKey]!;
+        return CorepunkItemDetail(
+          id: cached.id,
+          name: cached.name,
+          slug: cached.slug,
           quality: original.quality,
-          type: original.type,
-          tier: original.tier,
-          level: original.level,
-          profession: cachedProf,
-          professionLevel: original.professionLevel,
-          description: cachedDesc,
-          descriptionEffect: cachedEffect,
+          type: cached.type,
+          tier: cached.tier,
+          level: cached.level,
+          profession: cached.profession,
+          professionLevel: cached.professionLevel,
+          description: cached.description,
+          descriptionEffect: cached.descriptionEffect,
           stats: original.stats,
           workbenchIngredients: original.workbenchIngredients,
           synthesisRecipes: original.synthesisRecipes,
-          specialEffect: (cachedEffect.isNotEmpty)
-              ? SpecialEffectInfo(
-                  id: original.specialEffect?.id ?? 99,
-                  title: _cleanAndTranslateEffectText(original.specialEffect?.title ?? 'Chance On-hit'),
-                  descriptionEffect: cachedEffect,
-                )
-              : original.specialEffect,
+          specialEffect: cached.specialEffect ?? original.specialEffect,
         );
+      }
 
-        _memoryCache[cacheKey] = diskDetail;
-        return diskDetail;
-      } catch (_) {}
+      final diskJson = StorageService.getTranslation(cacheKey);
+      if (diskJson != null && diskJson.isNotEmpty) {
+        try {
+          final decoded = jsonDecode(diskJson) as Map<String, dynamic>;
+          final String cachedName = decoded['name'] ?? original.name;
+          final String cachedDesc = decoded['description'] ?? original.description ?? '';
+          final String cachedEffect = decoded['descriptionEffect'] ?? original.descriptionEffect ?? '';
+          final String cachedProf = decoded['profession'] ?? (original.profession != null ? translateProfession(original.profession!) : '');
+
+          final diskDetail = CorepunkItemDetail(
+            id: original.id,
+            name: cachedName,
+            slug: original.slug,
+            quality: original.quality,
+            type: original.type,
+            tier: original.tier,
+            level: original.level,
+            profession: cachedProf,
+            professionLevel: original.professionLevel,
+            description: cachedDesc,
+            descriptionEffect: cachedEffect,
+            stats: original.stats,
+            workbenchIngredients: original.workbenchIngredients,
+            synthesisRecipes: original.synthesisRecipes,
+            specialEffect: (cachedEffect.isNotEmpty)
+                ? SpecialEffectInfo(
+                    id: original.specialEffect?.id ?? 99,
+                    title: _cleanAndTranslateEffectText(original.specialEffect?.title ?? 'Chance On-hit'),
+                    descriptionEffect: cachedEffect,
+                  )
+                : original.specialEffect,
+          );
+
+          _memoryCache[cacheKey] = diskDetail;
+          return diskDetail;
+        } catch (_) {}
+      }
     }
 
     final String itemIdStr = original.id.toString();
