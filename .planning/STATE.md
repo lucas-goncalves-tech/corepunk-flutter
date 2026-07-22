@@ -2,15 +2,17 @@
 
 ## Current Position
 - **Active Milestone**: Milestone 2 (Items Database UI)
-- **Active Branch**: `feat/item-card-component`
-- **Active Phase**: Phase 2.5 (Item Grid Body & API Riverpod Integration)
-- **Status**: Real Corepunk API (`GET /api/items/by-category`) integrated with Riverpod `FutureProvider.family` for automatic TanStack Query-style memory caching! Awaiting user review/approval on Android Emulator.
+- **Active Phase**: Phase 2.6 (Item Detail Modal / Sheet Component)
+- **Status**: Phase 2.5 (Real Corepunk API + Riverpod Cache + Debounced Search + Pull-to-Refresh + Item Card Component) fully completed, merged, and pushed to `origin/main`!
 
-## Decisions Log
-- Target Platforms: Android Emulator (AVD) + Windows Desktop (Win 10/11)
-- UI Language: 100% pt-BR (Português Brasil)
-- State Management: Riverpod 2.x (`FutureProvider.family` + `ItemFilters` comparator for automatic cache keys).
-- HTTP Client: `http` package fetching from `https://corepunk.help/api/items/by-category`.
+## Completed Commits & Pushes
+- `feat(navigation)`: Corepunk Dark Theme, Header and Bottom Navigation Shell.
+- `feat(items)`: Category Selector Bar with exact Corepunk API types (`implant`, `weapon`, etc.).
+- `feat(items)`: Search Bar, Secondary Filters (Quality, Tier, Profession, Mastery), Riverpod Cache, Debounced Search, Pull-to-Refresh & Item Card Component matching exact design.
+
+## Verification Status
+- `flutter analyze`: `No issues found!` (0 errors).
+- Git push: Successfully pushed to `https://github.com/lucas-goncalves-tech/corepunk-flutter.git`.
 
 ## Pending Verification / Gates
-- Gate 2.5: User visual & functional approval of Real API Integration with Riverpod Cache.
+- Gate 2.6: Item Detail Modal / Sheet (Stats detalhadas, receita de craft, requisitos e lore do item).
