@@ -35,14 +35,23 @@ class ItemTranslationService {
     String text = input;
 
     final Map<String, String> phrases = {
+      'Chance On-hit:': 'Chance ao Atingir:',
       'Chance On-hit': 'Chance ao Atingir',
       'On-ability use': 'Ao usar habilidade',
+      'Your attacks have a': 'Seus ataques têm',
+      'chance to apply': 'chance de aplicar',
+      'Each stack deals': 'Cada acúmulo causa',
+      'per second over': 'por segundo durante',
+      'Can stack up to': 'Pode acumular até',
+      'times.': 'vezes.',
+      'times': 'vezes',
+      'seconds.': 'segundos.',
+      'seconds': 'segundos',
+      'second': 'segundo',
       'Increases': 'Aumenta',
       'Increase': 'Aumenta',
       'by': 'em',
       'Duration:': 'Duração:',
-      'seconds': 'segundos',
-      'second': 'segundo',
     };
 
     phrases.forEach((en, pt) {
@@ -102,66 +111,76 @@ class ItemTranslationService {
     return input;
   }
 
-  static Future<CorepunkItemDetail> translateItemDetail(CorepunkItemDetail original) async {
+  static Future<CorepunkItemDetail> translateItemDetail(CorepunkItemDetail original, {bool forceRefetch = false}) async {
     final cacheKey = original.id.toString();
 
-    if (_memoryCache.containsKey(cacheKey)) {
-      final cached = _memoryCache[cacheKey]!;
-      return CorepunkItemDetail(
-        id: cached.id,
-        name: cached.name,
-        slug: cached.slug,
-        quality: original.quality,
-        type: cached.type,
-        tier: cached.tier,
-        level: cached.level,
-        profession: cached.profession,
-        professionLevel: cached.professionLevel,
-        description: cached.description,
-        descriptionEffect: cached.descriptionEffect,
-        stats: original.stats,
-        workbenchIngredients: original.workbenchIngredients,
-        synthesisRecipes: original.synthesisRecipes,
-        specialEffect: cached.specialEffect ?? original.specialEffect,
-      );
-    }
-
-    final diskJson = StorageService.getTranslation(cacheKey);
-    if (diskJson != null && diskJson.isNotEmpty) {
-      try {
-        final decoded = jsonDecode(diskJson) as Map<String, dynamic>;
-        final String cachedName = decoded['name'] ?? original.name;
-        final String cachedDesc = decoded['description'] ?? original.description ?? '';
-        final String cachedEffect = decoded['descriptionEffect'] ?? original.descriptionEffect ?? '';
-        final String cachedProf = decoded['profession'] ?? (original.profession != null ? translateProfession(original.profession!) : '');
-
-        final diskDetail = CorepunkItemDetail(
-          id: original.id,
-          name: cachedName,
-          slug: original.slug,
+    if (!forceRefetch) {
+      if (_memoryCache.containsKey(cacheKey)) {
+        final cached = _memoryCache[cacheKey]!;
+        return CorepunkItemDetail(
+          id: cached.id,
+          name: cached.name,
+          slug: cached.slug,
           quality: original.quality,
-          type: original.type,
-          tier: original.tier,
-          level: original.level,
-          profession: cachedProf,
-          professionLevel: original.professionLevel,
-          description: cachedDesc,
-          descriptionEffect: cachedEffect,
+          type: cached.type,
+          tier: cached.tier,
+          level: cached.level,
+          upgradable: original.upgradable,
+          profession: cached.profession,
+          professionLevel: cached.professionLevel,
+          description: cached.description,
+          descriptionEffect: cached.descriptionEffect,
+          archetype: original.archetype,
+          sex: original.sex,
+          slot: original.slot,
           stats: original.stats,
           workbenchIngredients: original.workbenchIngredients,
           synthesisRecipes: original.synthesisRecipes,
-          specialEffect: (cachedEffect.isNotEmpty)
-              ? SpecialEffectInfo(
-                  id: original.specialEffect?.id ?? 99,
-                  title: _cleanAndTranslateEffectText(original.specialEffect?.title ?? 'Chance On-hit'),
-                  descriptionEffect: cachedEffect,
-                )
-              : original.specialEffect,
+          specialEffect: cached.specialEffect ?? original.specialEffect,
         );
+      }
 
-        _memoryCache[cacheKey] = diskDetail;
-        return diskDetail;
-      } catch (_) {}
+      final diskJson = StorageService.getTranslation(cacheKey);
+      if (diskJson != null && diskJson.isNotEmpty) {
+        try {
+          final decoded = jsonDecode(diskJson) as Map<String, dynamic>;
+          final String cachedName = decoded['name'] ?? original.name;
+          final String cachedDesc = decoded['description'] ?? original.description ?? '';
+          final String cachedEffect = decoded['descriptionEffect'] ?? original.descriptionEffect ?? '';
+          final String cachedProf = decoded['profession'] ?? (original.profession != null ? translateProfession(original.profession!) : '');
+
+          final diskDetail = CorepunkItemDetail(
+            id: original.id,
+            name: cachedName,
+            slug: original.slug,
+            quality: original.quality,
+            type: original.type,
+            tier: original.tier,
+            level: original.level,
+            upgradable: original.upgradable,
+            profession: cachedProf,
+            professionLevel: original.professionLevel,
+            description: cachedDesc,
+            descriptionEffect: cachedEffect,
+            archetype: original.archetype,
+            sex: original.sex,
+            slot: original.slot,
+            stats: original.stats,
+            workbenchIngredients: original.workbenchIngredients,
+            synthesisRecipes: original.synthesisRecipes,
+            specialEffect: (cachedEffect.isNotEmpty)
+                ? SpecialEffectInfo(
+                    id: original.specialEffect?.id ?? 99,
+                    title: _cleanAndTranslateEffectText(original.specialEffect?.title ?? 'Chance On-hit'),
+                    descriptionEffect: cachedEffect,
+                  )
+                : original.specialEffect,
+          );
+
+          _memoryCache[cacheKey] = diskDetail;
+          return diskDetail;
+        } catch (_) {}
+      }
     }
 
     final String itemIdStr = original.id.toString();
@@ -179,9 +198,13 @@ class ItemTranslationService {
       if (original.description != null && original.description!.isNotEmpty) {
         translatedDescription = await _translateTextApi(original.description!);
       }
-      if (original.descriptionEffect != null && original.descriptionEffect!.isNotEmpty) {
-        final apiTranslated = await _translateTextApi(original.descriptionEffect!);
-        translatedDescriptionEffect = _cleanAndTranslateEffectText(apiTranslated);
+    }
+
+    if (original.descriptionEffect != null && original.descriptionEffect!.isNotEmpty) {
+      if (override != null && override['descriptionEffect'] != null) {
+        translatedDescriptionEffect = override['descriptionEffect']!;
+      } else {
+        translatedDescriptionEffect = _cleanAndTranslateEffectText(original.descriptionEffect!);
       }
     }
 
@@ -197,10 +220,14 @@ class ItemTranslationService {
       type: original.type,
       tier: original.tier,
       level: original.level,
+      upgradable: original.upgradable,
       profession: translatedProfession,
       professionLevel: original.professionLevel,
       description: translatedDescription,
       descriptionEffect: translatedDescriptionEffect,
+      archetype: original.archetype,
+      sex: original.sex,
+      slot: original.slot,
       stats: original.stats,
       workbenchIngredients: original.workbenchIngredients,
       synthesisRecipes: original.synthesisRecipes,
@@ -223,6 +250,7 @@ class ItemTranslationService {
       'type': translatedDetail.type,
       'tier': translatedDetail.tier,
       'level': translatedDetail.level,
+      'upgradable': translatedDetail.upgradable,
       'profession': translatedDetail.profession,
       'professionLevel': translatedDetail.professionLevel,
       'description': translatedDetail.description,

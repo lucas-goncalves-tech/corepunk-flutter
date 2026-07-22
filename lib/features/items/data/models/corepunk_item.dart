@@ -6,10 +6,14 @@ class CorepunkItem {
   final String type;
   final int tier;
   final int level;
+  final bool upgradable;
   final String? profession;
   final String? mastery;
   final String? descriptionEffect;
   final String? description;
+  final String? archetype;
+  final String? sex;
+  final String? slot;
   final List<String> tags;
 
   const CorepunkItem({
@@ -20,10 +24,14 @@ class CorepunkItem {
     required this.type,
     required this.tier,
     required this.level,
+    this.upgradable = false,
     this.profession,
     this.mastery,
     this.descriptionEffect,
     this.description,
+    this.archetype,
+    this.sex,
+    this.slot,
     this.tags = const [],
   });
 
@@ -51,10 +59,14 @@ class CorepunkItem {
       type: json['type']?.toString().toLowerCase() ?? '',
       tier: (json['tier'] is num) ? (json['tier'] as num).toInt() : 1,
       level: (json['level'] is num) ? (json['level'] as num).toInt() : 1,
+      upgradable: json['upgradable'] == true,
       profession: json['profession']?.toString(),
       mastery: json['mastery']?.toString(),
       descriptionEffect: json['descriptionEffect']?.toString(),
       description: json['description']?.toString(),
+      archetype: json['archetype']?.toString(),
+      sex: json['sex']?.toString(),
+      slot: json['slot']?.toString(),
       tags: extractedTags,
     );
   }

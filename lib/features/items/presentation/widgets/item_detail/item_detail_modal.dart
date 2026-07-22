@@ -34,6 +34,9 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
   late String _selectedQuality;
   late Future<CorepunkItemDetail> _translationFuture;
 
+  bool _isRefetchingTranslation = false;
+  DateTime? _lastRefetchTime;
+
   @override
   void initState() {
     super.initState();
@@ -41,15 +44,57 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
     _initTranslation();
   }
 
-  void _initTranslation() {
+  void _initTranslation({bool forceRefetch = false}) {
     final rawDetail = _buildRawDetail();
-    _translationFuture = ItemTranslationService.translateItemDetail(rawDetail);
+    _translationFuture = ItemTranslationService.translateItemDetail(rawDetail, forceRefetch: forceRefetch);
   }
 
   void _onQualityChanged(String newQuality) {
     setState(() {
       _selectedQuality = newQuality;
     });
+  }
+
+  Future<void> _handleManualRefetchTranslation() async {
+    if (_isRefetchingTranslation) return;
+
+    if (_lastRefetchTime != null) {
+      final elapsed = DateTime.now().difference(_lastRefetchTime!).inSeconds;
+      if (elapsed < 5) {
+        final remaining = 5 - elapsed;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Aguarde $remaining segundo(s) antes de traduzir novamente.'),
+            duration: const Duration(seconds: 2),
+            backgroundColor: AppColors.popover,
+          ),
+        );
+        return;
+      }
+    }
+
+    setState(() {
+      _isRefetchingTranslation = true;
+      _lastRefetchTime = DateTime.now();
+      _initTranslation(forceRefetch: true);
+    });
+
+    try {
+      await _translationFuture;
+    } catch (_) {}
+
+    if (mounted) {
+      setState(() {
+        _isRefetchingTranslation = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Tradução recarregada com sucesso!'),
+          duration: Duration(seconds: 2),
+          backgroundColor: AppColors.card,
+        ),
+      );
+    }
   }
 
   CorepunkItemDetail _buildRawDetail() {
@@ -130,9 +175,13 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
       type: widget.itemSummary.type,
       tier: widget.itemSummary.tier,
       level: widget.itemSummary.level,
+      upgradable: widget.itemSummary.upgradable,
       profession: widget.itemSummary.profession,
       descriptionEffect: widget.itemSummary.descriptionEffect,
       description: widget.itemSummary.description,
+      archetype: widget.itemSummary.archetype,
+      sex: widget.itemSummary.sex,
+      slot: widget.itemSummary.slot,
       stats: stats,
       workbenchIngredients: workbenchIngredients,
       synthesisRecipes: recipes,
@@ -182,10 +231,14 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
                     type: translatedBase.type,
                     tier: translatedBase.tier,
                     level: translatedBase.level,
+                    upgradable: translatedBase.upgradable,
                     profession: translatedBase.profession,
                     professionLevel: translatedBase.professionLevel,
                     description: translatedBase.description,
                     descriptionEffect: translatedBase.descriptionEffect,
+                    archetype: translatedBase.archetype ?? widget.itemSummary.archetype,
+                    sex: translatedBase.sex ?? widget.itemSummary.sex,
+                    slot: translatedBase.slot ?? widget.itemSummary.slot,
                     stats: translatedBase.stats,
                     workbenchIngredients: translatedBase.workbenchIngredients,
                     synthesisRecipes: translatedBase.synthesisRecipes,
@@ -207,6 +260,8 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
                         item: detail,
                         selectedQuality: _selectedQuality,
                         onQualitySelected: _onQualityChanged,
+                        onRefetchTranslation: _handleManualRefetchTranslation,
+                        isRefetching: _isRefetchingTranslation,
                       ),
                       Expanded(
                         child: ListView(
@@ -214,7 +269,7 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
                           padding: const EdgeInsets.all(16.0),
                           children: [
                             if (detail.type == 'skin') ItemSkinSetWidget(item: detail),
-                            if (detail.type != 'skin' && (detail.stats.isNotEmpty || detail.specialEffect != null))
+                            if (detail.type != 'skin' && (detail.stats.isNotEmpty || detail.specialEffect != null || (detail.description != null && detail.description!.isNotEmpty)))
                               ItemStatsWidget(item: detail),
                             if (detail.workbenchIngredients.isNotEmpty && detail.type != 'skin')
                               ItemCraftingCalculatorWidget(item: detail),
@@ -243,40 +298,6 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
                                     Text(
                                       'Especialização: ${detail.profession!}',
                                       style: const TextStyle(color: AppColors.cardForeground, fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                            if (detail.description != null && detail.description!.isNotEmpty) ...[
-                              Container(
-                                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                                padding: const EdgeInsets.all(16.0),
-                                decoration: BoxDecoration(
-                                  color: AppColors.card,
-                                  borderRadius: AppColors.borderRadius,
-                                  border: Border.all(color: AppColors.border),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'DESCRIÇÃO / LORE:',
-                                      style: TextStyle(
-                                        color: AppColors.primary,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      detail.description!,
-                                      style: const TextStyle(
-                                        color: AppColors.mutedForeground,
-                                        fontSize: 12,
-                                        fontStyle: FontStyle.italic,
-                                      ),
                                     ),
                                   ],
                                 ),

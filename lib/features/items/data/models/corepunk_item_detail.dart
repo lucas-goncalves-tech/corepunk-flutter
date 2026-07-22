@@ -91,10 +91,14 @@ class CorepunkItemDetail {
   final String type;
   final int tier;
   final int level;
+  final bool upgradable;
   final String? profession;
   final String? professionLevel;
   final String? description;
   final String? descriptionEffect;
+  final String? archetype;
+  final String? sex;
+  final String? slot;
   final List<ItemStatInfo> stats;
   final List<IngredientItem> workbenchIngredients;
   final List<CraftRecipeInfo> synthesisRecipes;
@@ -108,10 +112,14 @@ class CorepunkItemDetail {
     required this.type,
     required this.tier,
     required this.level,
+    this.upgradable = false,
     this.profession,
     this.professionLevel,
     this.description,
     this.descriptionEffect,
+    this.archetype,
+    this.sex,
+    this.slot,
     this.stats = const [],
     this.workbenchIngredients = const [],
     this.synthesisRecipes = const [],
@@ -162,10 +170,14 @@ class CorepunkItemDetail {
       type: json['type']?.toString().toLowerCase() ?? '',
       tier: (json['tier'] is num) ? (json['tier'] as num).toInt() : 1,
       level: (json['level'] is num) ? (json['level'] as num).toInt() : 1,
+      upgradable: json['upgradable'] == true,
       profession: json['profession']?.toString(),
       professionLevel: json['professionLevel']?.toString(),
       description: json['description']?.toString(),
       descriptionEffect: json['descriptionEffect']?.toString(),
+      archetype: json['archetype']?.toString(),
+      sex: json['sex']?.toString(),
+      slot: json['slot']?.toString(),
       stats: rawStats,
       workbenchIngredients: rawIngredients,
       synthesisRecipes: recipes,

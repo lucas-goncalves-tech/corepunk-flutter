@@ -6,12 +6,16 @@ class ItemDetailHeaderWidget extends StatelessWidget {
   final CorepunkItemDetail item;
   final String selectedQuality;
   final ValueChanged<String> onQualitySelected;
+  final VoidCallback? onRefetchTranslation;
+  final bool isRefetching;
 
   const ItemDetailHeaderWidget({
     super.key,
     required this.item,
     required this.selectedQuality,
     required this.onQualitySelected,
+    this.onRefetchTranslation,
+    this.isRefetching = false,
   });
 
   Color _getBorderColor(String quality) {
@@ -90,6 +94,28 @@ class ItemDetailHeaderWidget extends StatelessWidget {
                   ],
                 ),
               ),
+              if (onRefetchTranslation != null)
+                isRefetching
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12.0),
+                        child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      )
+                    : IconButton(
+                        icon: const Icon(
+                          Icons.g_translate_rounded,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
+                        tooltip: 'Recarregar Tradução',
+                        onPressed: onRefetchTranslation,
+                      ),
               IconButton(
                 icon: const Icon(Icons.close, color: AppColors.mutedForeground),
                 onPressed: () => Navigator.of(context).pop(),
