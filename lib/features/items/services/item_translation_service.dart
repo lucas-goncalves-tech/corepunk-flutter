@@ -5,12 +5,29 @@ import '../data/models/corepunk_item_detail.dart';
 class ItemTranslationService {
   static final Map<String, CorepunkItemDetail> _memoryCache = {};
 
+  static final Map<String, String> _professionMap = {
+    'mining': 'Mineração',
+    'logging': 'Corte de Madeira',
+    'butchery': 'Açougue',
+    'herbalism': 'Herbologia',
+    'construction': 'Construção',
+    'weaponsmithing': 'Armaria',
+    'mysticism': 'Misticismo',
+    'alchemy': 'Alquimia',
+    'cooking': 'Culinária',
+    'other': 'Outro',
+  };
+
   static final Map<String, Map<String, String>> _manualOverrides = {
     '203430': {
       'name': 'Picada Ácida',
       'description': 'A Manopla Picada Ácida é uma ferramenta de combate corpo a corpo mortal, incorporando um toque venenoso ao seu design.',
     },
   };
+
+  static String translateProfession(String profession) {
+    return _professionMap[profession.toLowerCase()] ?? profession;
+  }
 
   static String _cleanAndTranslateEffectText(String input) {
     if (input.trim().isEmpty) return input;
@@ -19,13 +36,17 @@ class ItemTranslationService {
     final Map<String, String> phrases = {
       'Chance On-hit': 'Chance ao Atingir',
       'On-ability use': 'Ao usar habilidade',
-      'Your attacks have a': 'Seus ataques têm de',
+      'Your attacks have a': 'Seus ataques têm',
       'chance to apply': 'chance de aplicar',
       'Each stack deals': 'Cada acúmulo causa',
       'per second over': 'por segundo durante',
       'seconds': 'segundos',
+      'second': 'segundo',
       'Can stack up to': 'Pode acumular até',
       'times': 'vezes',
+      'Increase': 'Aumenta',
+      'by': 'em',
+      'Duration:': 'Duração:',
     };
 
     phrases.forEach((en, pt) {
@@ -33,9 +54,16 @@ class ItemTranslationService {
     });
 
     final Map<String, String> bracketTags = {
+      r'\[mcc\]': 'Chance Crítica Mágica',
+      r'\[pcc\]': 'Chance Crítica Física',
+      r'\[mcd\]': 'Dano Crítico Mágico',
+      r'\[pcd\]': 'Dano Crítico Físico',
+      r'\[mres\]': 'Resistência Mágica',
+      r'\[pres\]': 'Resistência Física',
       r'\[ap\]': 'Poder de Ataque',
       r'\[wd\]': 'Dano de Arma',
       r'\[md\]': 'Dano Mágico',
+      r'\[pd\]': 'Dano Físico',
       r'\[sp\]': 'Poder Mágico',
       r'\[armor\]': 'Armadura',
       r'\[poison\]': 'Veneno',
@@ -43,6 +71,8 @@ class ItemTranslationService {
       r'\[as\]': 'Velocidade de Ataque',
       r'\[hp\]': 'Vida',
       r'\[mp\]': 'Mana',
+      r'\[movespeed\]': 'Velocidade de Movimento',
+      r'\[ms\]': 'Velocidade de Movimento',
     };
 
     bracketTags.forEach((pattern, replacement) {
@@ -103,6 +133,10 @@ class ItemTranslationService {
       translatedDescriptionEffect = _cleanAndTranslateEffectText(original.descriptionEffect!);
     }
 
+    final String translatedProfession = original.profession != null
+        ? translateProfession(original.profession!)
+        : '';
+
     final translatedDetail = CorepunkItemDetail(
       id: original.id,
       name: translatedName,
@@ -111,7 +145,7 @@ class ItemTranslationService {
       type: original.type,
       tier: original.tier,
       level: original.level,
-      profession: original.profession,
+      profession: translatedProfession,
       professionLevel: original.professionLevel,
       description: translatedDescription,
       descriptionEffect: translatedDescriptionEffect,

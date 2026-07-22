@@ -29,7 +29,18 @@ class ItemStatsWidget extends StatelessWidget {
       case 'mp':
         return 'Mana Máxima';
       case 'mdr':
+      case 'mres':
         return 'Resistência Mágica';
+      case 'pres':
+        return 'Resistência Física';
+      case 'mcc':
+        return 'Chance Crítica Mágica';
+      case 'pcc':
+        return 'Chance Crítica Física';
+      case 'mcd':
+        return 'Dano Crítico Mágico';
+      case 'pcd':
+        return 'Dano Crítico Físico';
       default:
         return type.toUpperCase();
     }
