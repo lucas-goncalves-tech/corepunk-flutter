@@ -53,9 +53,10 @@ class ItemStatsWidget extends StatelessWidget {
       case 'rare':
         return 2;
       case 'uncommon':
+        return 1;
       case 'common':
       default:
-        return 1;
+        return 0;
     }
   }
 
@@ -124,7 +125,7 @@ class ItemStatsWidget extends StatelessWidget {
             }),
             const Divider(height: 20, color: AppColors.border),
           ],
-          if (item.type.toLowerCase() == 'weapon' || item.type.toLowerCase() == 'implant') ...[
+          if (chipSlots > 0 && (item.type.toLowerCase() == 'weapon' || item.type.toLowerCase() == 'implant')) ...[
             const Text(
               'ATRIBUTOS SECUNDÁRIOS (SECONDARY STATS):',
               style: TextStyle(
