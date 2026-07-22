@@ -84,10 +84,18 @@ class _ItemsPageState extends State<ItemsPage> {
             selectedProfession: _filters.profession,
             selectedMastery: _filters.mastery,
             onSearchChanged: _onSearchChanged,
-            onQualityChanged: (quality) => setState(() => _filters = _filters.copyWith(quality: quality, page: 1)),
-            onTierChanged: (tier) => setState(() => _filters = _filters.copyWith(tier: tier, page: 1)),
-            onProfessionChanged: (prof) => setState(() => _filters = _filters.copyWith(profession: prof, page: 1)),
-            onMasteryChanged: (mastery) => setState(() => _filters = _filters.copyWith(mastery: mastery, page: 1)),
+            onQualityChanged: (quality) => setState(
+              () => _filters = _filters.copyWith(quality: quality, page: 1),
+            ),
+            onTierChanged: (tier) => setState(
+              () => _filters = _filters.copyWith(tier: tier, page: 1),
+            ),
+            onProfessionChanged: (prof) => setState(
+              () => _filters = _filters.copyWith(profession: prof, page: 1),
+            ),
+            onMasteryChanged: (mastery) => setState(
+              () => _filters = _filters.copyWith(mastery: mastery, page: 1),
+            ),
             onResetFilters: _resetFilters,
           ),
           Expanded(
@@ -151,20 +159,20 @@ class _ItemsPageState extends State<ItemsPage> {
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(16.0),
                         itemCount: items.length,
-                        separatorBuilder: (context, index) => const SizedBox(height: 8),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 8),
                         itemBuilder: (context, index) {
                           final item = items[index];
-                          return ItemCardWidget(
-                            item: item,
-                            onTap: () {},
-                          );
+                          return ItemCardWidget(item: item, onTap: () {});
                         },
                       ),
                     );
                   },
                   loading: () {
                     return const Center(
-                      child: CircularProgressIndicator(color: AppColors.primary),
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
                     );
                   },
                   error: (error, stackTrace) {
@@ -187,7 +195,8 @@ class _ItemsPageState extends State<ItemsPage> {
                           ),
                           const SizedBox(height: 8),
                           TextButton(
-                            onPressed: () => ref.invalidate(itemsProvider(_filters)),
+                            onPressed: () =>
+                                ref.invalidate(itemsProvider(_filters)),
                             child: const Text(
                               'Recarregar (F5)',
                               style: TextStyle(color: AppColors.primary),
