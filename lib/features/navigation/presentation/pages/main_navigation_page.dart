@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../items/presentation/pages/items_page.dart';
-import '../../../heroes/presentation/pages/heroes_page.dart';
+import '../../../builds/presentation/pages/builds_page.dart';
 import '../../../guides/presentation/pages/guides_page.dart';
 import '../../../maps/presentation/pages/maps_page.dart';
 
@@ -17,7 +17,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   final List<Widget> _pages = const [
     ItemsPage(),
-    HeroesPage(),
+    BuildsPage(),
     GuidesPage(),
     MapsPage(),
   ];
@@ -72,9 +72,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
                 label: 'Itens',
               ),
               NavigationDestination(
-                icon: Icon(Icons.shield_outlined),
-                selectedIcon: Icon(Icons.shield),
-                label: 'Heróis',
+                icon: Icon(Icons.build_circle_outlined),
+                selectedIcon: Icon(Icons.build_circle),
+                label: 'Builds',
               ),
               NavigationDestination(
                 icon: Icon(Icons.menu_book_outlined),
