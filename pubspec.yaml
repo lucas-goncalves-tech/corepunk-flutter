@@ -7,12 +7,15 @@ environment:
   sdk: ^3.12.2
 
 dependencies:
+  fluent_ui: ^4.16.0
   flutter:
     sdk: flutter
+  flutter_acrylic: ^1.1.4
   flutter_riverpod: ^2.5.1
   http: ^1.2.1
   shared_preferences: ^2.2.2
   url_launcher: ^6.3.2
+  window_manager: ^0.5.2
 
 dev_dependencies:
   flutter_test:

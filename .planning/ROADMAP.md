@@ -19,3 +19,8 @@
 ### Milestone 4: Multi-Platform Build & Verification
 - [ ] Phase 3.1: Windows 10/11 Desktop Build & Native (.exe) Testing
 - [ ] Phase 3.2: Android APK / Emulator Final Release Build
+
+### Milestone 5: Fluent UI Windows Pivot
+- [ ] Phase 5.1: Install fluent_ui and window_manager, replace Scaffolds with NavigationView
+- [ ] Phase 5.2: Convert Bottom Sheet Modals to Desktop Dialogs
+- [ ] Phase 5.3: Set Window constraints (Min 800x600, Frameless Titlebar)

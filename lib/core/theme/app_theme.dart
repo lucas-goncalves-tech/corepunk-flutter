@@ -1,70 +1,36 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'app_colors.dart';
 
 abstract class AppTheme {
-  static ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
+  static FluentThemeData get darkTheme {
+    return FluentThemeData(
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.background,
-      colorScheme: const ColorScheme.dark(
-        surface: AppColors.background,
-        onSurface: AppColors.foreground,
-        primary: AppColors.primary,
-        onPrimary: AppColors.primaryForeground,
-        secondary: AppColors.secondary,
-        onSecondary: AppColors.secondaryForeground,
-        error: AppColors.destructive,
-        onError: AppColors.destructiveForeground,
-        outline: AppColors.border,
-      ),
-      cardTheme: CardThemeData(
-        color: AppColors.card,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppColors.borderRadius,
-          side: const BorderSide(color: AppColors.border, width: 1),
-        ),
-      ),
-      appBarTheme: const AppBarTheme(
+      navigationPaneTheme: NavigationPaneThemeData(
         backgroundColor: AppColors.background,
-        foregroundColor: AppColors.foreground,
-        surfaceTintColor: Colors.transparent,
-        scrolledUnderElevation: 0.0,
-        elevation: 0,
-        centerTitle: false,
       ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: AppColors.input,
-        hintStyle: const TextStyle(color: AppColors.mutedForeground),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        border: OutlineInputBorder(
-          borderRadius: AppColors.borderRadius,
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: AppColors.borderRadius,
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: AppColors.borderRadius,
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-        ),
+      activeColor: AppColors.primary,
+      accentColor: AccentColor.swatch({
+        'darkest': AppColors.primary.withValues(alpha: 0.8),
+        'darker': AppColors.primary.withValues(alpha: 0.9),
+        'dark': AppColors.primary,
+        'normal': AppColors.primary,
+        'light': AppColors.primary.withValues(alpha: 0.9),
+        'lighter': AppColors.primary.withValues(alpha: 0.8),
+        'lightest': AppColors.primary.withValues(alpha: 0.7),
+      }),
+      inactiveBackgroundColor: AppColors.muted,
+      cardColor: AppColors.card,
+      shadowColor: const Color(0xFF000000),
+      typography: Typography.fromBrightness(
+        brightness: Brightness.dark,
+      ).apply(
+        displayColor: AppColors.foreground,
       ),
-      dialogTheme: DialogThemeData(
-        backgroundColor: AppColors.popover,
-        elevation: 8,
-        shape: RoundedRectangleBorder(
+      dialogTheme: const ContentDialogThemeData(
+        decoration: BoxDecoration(
+          color: AppColors.popover,
           borderRadius: AppColors.borderRadius,
-          side: const BorderSide(color: AppColors.border),
-        ),
-      ),
-      bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: AppColors.popover,
-        modalBackgroundColor: AppColors.popover,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppColors.radius)),
         ),
       ),
     );

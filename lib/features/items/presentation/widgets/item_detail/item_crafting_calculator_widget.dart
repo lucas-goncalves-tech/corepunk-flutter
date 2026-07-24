@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../data/models/corepunk_item_detail.dart';
@@ -19,12 +19,30 @@ class ItemCraftingCalculatorWidget extends ConsumerStatefulWidget {
 class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalculatorWidget> {
   int _selectedRecipeIndex = 0;
   int _craftQuantity = 1;
+  
+  final Map<String, TextEditingController> _controllers = {};
+
+  @override
+  void dispose() {
+    for (final controller in _controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
 
   String _formatGold(double amount) {
     if (amount == amount.truncateToDouble()) {
       return '${amount.toInt()}g';
     }
     return '${amount.toStringAsFixed(2).replaceAll(RegExp(r'\.?0+$'), '')}g';
+  }
+
+  Widget _buildDivider() {
+    return Container(
+      height: 1,
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      color: AppColors.border,
+    );
   }
 
   @override
@@ -69,22 +87,19 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
                 ),
               ),
               if (recipes.length > 1)
-                DropdownButtonHideUnderline(
-                  child: DropdownButton<int>(
-                    value: _selectedRecipeIndex,
-                    dropdownColor: AppColors.popover,
-                    style: const TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold),
-                    icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.primary),
-                    onChanged: (val) {
-                      if (val != null) setState(() => _selectedRecipeIndex = val);
-                    },
-                    items: List.generate(recipes.length, (index) {
-                      return DropdownMenuItem<int>(
-                        value: index,
-                        child: Text(recipes[index].name),
-                      );
-                    }),
-                  ),
+                ComboBox<int>(
+                  value: _selectedRecipeIndex,
+                  style: const TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold),
+                  icon: const Icon(FluentIcons.chevron_down, color: AppColors.primary),
+                  onChanged: (val) {
+                    if (val != null) setState(() => _selectedRecipeIndex = val);
+                  },
+                  items: List.generate(recipes.length, (index) {
+                    return ComboBoxItem<int>(
+                      value: index,
+                      child: Text(recipes[index].name),
+                    );
+                  }),
                 ),
             ],
           ),
@@ -111,7 +126,7 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
                             ing.imageUrl,
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.inventory_2_outlined, size: 20, color: AppColors.mutedForeground),
+                                const Icon(FluentIcons.packages, size: 20, color: AppColors.mutedForeground),
                           ),
                         ),
                       ),
@@ -136,7 +151,7 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
               }).toList(),
             ),
           ),
-          const Divider(height: 24, color: AppColors.border),
+          _buildDivider(),
           const Text(
             'CALCULADORA DE CUSTOS EM OURO',
             style: TextStyle(
@@ -153,6 +168,10 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
             final formattedInitial = (unitCost > 0.0)
                 ? ((unitCost == unitCost.truncateToDouble()) ? '${unitCost.toInt()}' : '$unitCost')
                 : '';
+                
+            if (!_controllers.containsKey(ing.slug)) {
+              _controllers[ing.slug] = TextEditingController(text: formattedInitial);
+            }
 
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -172,7 +191,7 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
                         ing.imageUrl,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.inventory_2_outlined, size: 12, color: AppColors.mutedForeground),
+                            const Icon(FluentIcons.packages, size: 12, color: AppColors.mutedForeground),
                       ),
                     ),
                   ),
@@ -190,16 +209,13 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
                   SizedBox(
                     width: 75,
                     height: 32,
-                    child: TextFormField(
+                    child: TextBox(
                       key: ValueKey(ing.slug),
-                      initialValue: formattedInitial,
+                      controller: _controllers[ing.slug],
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       style: const TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold),
-                      decoration: InputDecoration(
-                        hintText: '0g',
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                      ),
+                      placeholder: '0g',
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       onChanged: (val) {
                         final cleanVal = val.replaceAll(',', '.');
                         final parsed = double.tryParse(cleanVal) ?? 0.0;
@@ -235,14 +251,14 @@ class _ItemCraftingCalculatorWidgetState extends ConsumerState<ItemCraftingCalcu
                   children: [
                     const Text('Fabricar Qtd: ', style: TextStyle(color: AppColors.mutedForeground, fontSize: 12)),
                     IconButton(
-                      icon: const Icon(Icons.remove_circle_outline_rounded, size: 18, color: AppColors.primary),
+                      icon: const Icon(FluentIcons.remove, size: 16, color: AppColors.primary),
                       onPressed: () {
                         if (_craftQuantity > 1) setState(() => _craftQuantity--);
                       },
                     ),
                     Text('$_craftQuantity', style: const TextStyle(color: AppColors.cardForeground, fontWeight: FontWeight.bold)),
                     IconButton(
-                      icon: const Icon(Icons.add_circle_outline_rounded, size: 18, color: AppColors.primary),
+                      icon: const Icon(FluentIcons.add, size: 16, color: AppColors.primary),
                       onPressed: () => setState(() => _craftQuantity++),
                     ),
                   ],

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../data/models/corepunk_item_detail.dart';
 
@@ -50,6 +50,14 @@ class ItemSkinSetWidget extends StatelessWidget {
     return value[0].toUpperCase() + value.substring(1);
   }
 
+  Widget _buildDivider() {
+    return Container(
+      height: 1,
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      color: AppColors.border,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (item.type.toLowerCase() != 'skin') {
@@ -79,17 +87,17 @@ class ItemSkinSetWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          _buildInfoRow(Icons.accessibility_new_rounded, 'Personagem', _capitalize(item.archetype)),
-          _buildInfoRow(Icons.person_rounded, 'Sexo', _capitalize(item.sex)),
-          _buildInfoRow(Icons.checkroom_rounded, 'Slot', _capitalize(item.slot)),
+          _buildInfoRow(FluentIcons.contact, 'Personagem', _capitalize(item.archetype)),
+          _buildInfoRow(FluentIcons.personalize, 'Sexo', _capitalize(item.sex)),
+          _buildInfoRow(FluentIcons.shirt, 'Slot', _capitalize(item.slot)),
           if (parsed != null)
-            _buildInfoRow(Icons.color_lens_rounded, 'Cor', _capitalize(parsed.color)),
+            _buildInfoRow(FluentIcons.color, 'Cor', _capitalize(parsed.color)),
           if (item.upgradable && parsed != null) ...[
-            const Divider(height: 24, color: AppColors.border),
+            _buildDivider(),
             _buildCompleteSetGrid(parsed.setBase, parsed.currentSlot, parsed.color),
           ],
           if (item.description != null && item.description!.isNotEmpty) ...[
-            const Divider(height: 24, color: AppColors.border),
+            _buildDivider(),
             Text(
               item.description!,
               style: const TextStyle(
@@ -169,7 +177,7 @@ class ItemSkinSetWidget extends StatelessWidget {
                               imageUrl,
                               fit: BoxFit.contain,
                               errorBuilder: (context, error, stackTrace) =>
-                                  Icon(Icons.checkroom_rounded, color: borderColor, size: 24),
+                                  Icon(FluentIcons.shirt, color: borderColor, size: 24),
                             ),
                           ),
                         ),

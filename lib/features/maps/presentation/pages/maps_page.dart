@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class MapsPage extends StatelessWidget {
@@ -6,13 +6,13 @@ class MapsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
+    return const ScaffoldPage(
+      content: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.map_outlined,
+              FluentIcons.map_pin,
               size: 48,
               color: AppColors.primary,
             ),

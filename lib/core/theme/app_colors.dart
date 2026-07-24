@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 
 /// AppColors translates CSS design tokens into Flutter Color objects.
 /// Source: Corepunk Help CSS Theme variables.

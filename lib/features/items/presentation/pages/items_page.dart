@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/models/item_filters.dart';
 import '../../providers/items_provider.dart';
-import '../widgets/header.dart';
+
 import '../widgets/category_selector_widget.dart';
 import '../widgets/item_filter_bar_widget.dart';
 import '../widgets/item_card_widget.dart';
@@ -78,11 +78,13 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
     final asyncState = ref.watch(itemsProvider(_filters));
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       behavior: HitTestBehavior.opaque,
-      child: Scaffold(
-        appBar: const HeaderWidget(),
-        body: Column(
+      child: ScaffoldPage(
+        header: const PageHeader(
+          title: Text('Itens do Jogo', style: TextStyle(fontWeight: FontWeight.bold)),
+        ),
+        content: Column(
           children: [
             CategorySelectorWidget(
               selectedCategory: _filters.type,
@@ -118,85 +120,61 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                 data: (state) {
                   final items = state.items;
                   if (items.isEmpty) {
-                    return RefreshIndicator(
-                      color: AppColors.primary,
-                      backgroundColor: AppColors.card,
-                      onRefresh: () async {
-                        ref.invalidate(itemsProvider(_filters));
-                      },
-                      child: ListView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.4,
-                            child: const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.inbox_rounded,
-                                  size: 48,
+                    return ListView(
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.4,
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                FluentIcons.inbox,
+                                size: 48,
+                                color: AppColors.mutedForeground,
+                              ),
+                              SizedBox(height: 12),
+                              Text(
+                                'Nenhum item encontrado com esses filtros.',
+                                style: TextStyle(
                                   color: AppColors.mutedForeground,
+                                  fontSize: 13,
                                 ),
-                                SizedBox(height: 12),
-                                Text(
-                                  'Nenhum item encontrado com esses filtros.',
-                                  style: TextStyle(
-                                    color: AppColors.mutedForeground,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Puxe para baixo para atualizar',
-                                  style: TextStyle(
-                                    color: AppColors.primary,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   }
 
-                  return RefreshIndicator(
-                    color: AppColors.primary,
-                    backgroundColor: AppColors.card,
-                    onRefresh: () async {
-                      ref.invalidate(itemsProvider(_filters));
-                    },
-                    child: ListView.separated(
-                      controller: _scrollController,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(16.0),
-                      itemCount: items.length + (state.hasMore ? 1 : 0),
-                      separatorBuilder: (context, index) => const SizedBox(height: 8),
-                      itemBuilder: (context, index) {
-                        if (index == items.length) {
-                          return const Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Center(
-                              child: CircularProgressIndicator(color: AppColors.primary),
-                            ),
-                          );
-                        }
-                        
-                        final item = items[index];
-                        return ItemCardWidget(
-                          item: item,
-                          onTap: () {
-                            ItemDetailModal.show(context, item);
-                          },
+                  return ListView.separated(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(16.0),
+                    itemCount: items.length + (state.hasMore ? 1 : 0),
+                    separatorBuilder: (context, index) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      if (index == items.length) {
+                        return const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Center(
+                            child: ProgressRing(),
+                          ),
                         );
-                      },
-                    ),
+                      }
+                      
+                      final item = items[index];
+                      return ItemCardWidget(
+                        item: item,
+                        onTap: () {
+                          ItemDetailModal.show(context, item);
+                        },
+                      );
+                    },
                   );
                 },
                 loading: () {
                   return const Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
+                    child: ProgressRing(),
                   );
                 },
                 error: (error, stackTrace) {
@@ -205,7 +183,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(
-                          Icons.error_outline_rounded,
+                          FluentIcons.error,
                           size: 44,
                           color: AppColors.destructive,
                         ),
@@ -218,10 +196,10 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        TextButton(
+                        HyperlinkButton(
                           onPressed: () => ref.invalidate(itemsProvider(_filters)),
                           child: const Text(
-                            'Recarregar (F5)',
+                            'Recarregar',
                             style: TextStyle(color: AppColors.primary),
                           ),
                         ),

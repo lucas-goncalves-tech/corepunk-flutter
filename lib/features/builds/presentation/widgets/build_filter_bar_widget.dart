@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/models/build_filters.dart';
 
@@ -17,22 +17,22 @@ class BuildFilterBarWidget extends StatelessWidget {
   });
 
   static const List<Map<String, dynamic>> masteries = [
-    {'id': '', 'label': 'Todas', 'icon': Icons.shield_outlined},
-    {'id': 'legionnary', 'label': 'Legionário', 'icon': Icons.security_rounded},
-    {'id': 'shaman', 'label': 'Xamã', 'icon': Icons.spa_rounded},
-    {'id': 'blast-medic', 'label': 'Médico de Expl.', 'icon': Icons.medical_services_rounded},
-    {'id': 'infiltrator', 'label': 'Infiltrador', 'icon': Icons.visibility_off_rounded},
-    {'id': 'ranger', 'label': 'Patrulheiro', 'icon': Icons.my_location_rounded},
-    {'id': 'destroyer', 'label': 'Destruidor', 'icon': Icons.local_fire_department_rounded},
-    {'id': 'defender', 'label': 'Defensor', 'icon': Icons.shield_rounded},
-    {'id': 'champion', 'label': 'Campeão', 'icon': Icons.military_tech_rounded},
-    {'id': 'warmonger', 'label': 'Mestre da Guerra', 'icon': Icons.sports_martial_arts_rounded},
-    {'id': 'assassin', 'label': 'Assassino', 'icon': Icons.flash_on_rounded},
-    {'id': 'sniper', 'label': 'Atirador', 'icon': Icons.gps_fixed_rounded},
-    {'id': 'engineer', 'label': 'Engenheiro', 'icon': Icons.engineering_rounded},
-    {'id': 'bomber', 'label': 'Bomber', 'icon': Icons.whatshot_rounded},
-    {'id': 'mercenary', 'label': 'Mercenário', 'icon': Icons.monetization_on_rounded},
-    {'id': 'commando', 'label': 'Comando', 'icon': Icons.rocket_launch_rounded},
+    {'id': '', 'label': 'Todas', 'icon': FluentIcons.shield},
+    {'id': 'legionnary', 'label': 'Legionário', 'icon': FluentIcons.shield_solid},
+    {'id': 'shaman', 'label': 'Xamã', 'icon': FluentIcons.heart},
+    {'id': 'blast-medic', 'label': 'Médico de Expl.', 'icon': FluentIcons.medical},
+    {'id': 'infiltrator', 'label': 'Infiltrador', 'icon': FluentIcons.hide},
+    {'id': 'ranger', 'label': 'Patrulheiro', 'icon': FluentIcons.map_pin},
+    {'id': 'destroyer', 'label': 'Destruidor', 'icon': FluentIcons.flame_solid},
+    {'id': 'defender', 'label': 'Defensor', 'icon': FluentIcons.shield},
+    {'id': 'champion', 'label': 'Campeão', 'icon': FluentIcons.medal},
+    {'id': 'warmonger', 'label': 'Mestre da Guerra', 'icon': FluentIcons.user_sync},
+    {'id': 'assassin', 'label': 'Assassino', 'icon': FluentIcons.lightning_bolt},
+    {'id': 'sniper', 'label': 'Atirador', 'icon': FluentIcons.search},
+    {'id': 'engineer', 'label': 'Engenheiro', 'icon': FluentIcons.developer_tools},
+    {'id': 'bomber', 'label': 'Bomber', 'icon': FluentIcons.flame_solid},
+    {'id': 'mercenary', 'label': 'Mercenário', 'icon': FluentIcons.money},
+    {'id': 'commando', 'label': 'Comando', 'icon': FluentIcons.rocket},
   ];
 
   static const List<String> availableTags = [
@@ -91,16 +91,23 @@ class BuildFilterBarWidget extends StatelessWidget {
               ),
               const Spacer(),
               if (hasActiveFilters)
-                IconButton(
-                  tooltip: 'Limpar Tags',
-                  style: IconButton.styleFrom(
-                    backgroundColor: AppColors.destructive.withValues(alpha: 0.15),
-                    side: const BorderSide(color: AppColors.destructive),
-                    padding: const EdgeInsets.all(8),
-                    minimumSize: const Size(0, 0),
+                Tooltip(
+                  message: 'Limpar Tags',
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: onResetFilters,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.destructive.withValues(alpha: 0.15),
+                          borderRadius: AppColors.borderRadius,
+                          border: Border.all(color: AppColors.destructive),
+                        ),
+                        child: const Icon(FluentIcons.clear_filter, color: AppColors.destructive, size: 16),
+                      ),
+                    ),
                   ),
-                  icon: const Icon(Icons.filter_alt_off_rounded, color: AppColors.destructive, size: 18),
-                  onPressed: onResetFilters,
                 ),
             ],
           ),
@@ -136,37 +143,39 @@ class _MultiSelectTagsButton extends StatelessWidget {
     final isSelected = selectedTags.isNotEmpty;
     final label = isSelected ? '${selectedTags.length} Selecionadas' : 'Tags: Todas';
 
-    return InkWell(
-      onTap: () => _showMultiSelectDialog(context),
-      borderRadius: AppColors.borderRadius,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : AppColors.background,
-          borderRadius: AppColors.borderRadius,
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
-            width: isSelected ? 1.5 : 1.0,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => _showMultiSelectDialog(context),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : AppColors.background,
+            borderRadius: AppColors.borderRadius,
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.border,
+              width: isSelected ? 1.5 : 1.0,
+            ),
           ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? AppColors.primary : AppColors.mutedForeground,
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? AppColors.primary : AppColors.mutedForeground,
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                ),
               ),
-            ),
-            const SizedBox(width: 4),
-            Icon(
-              Icons.arrow_drop_down_rounded,
-              color: isSelected ? AppColors.primary : AppColors.mutedForeground,
-              size: 18,
-            ),
-          ],
+              const SizedBox(width: 4),
+              Icon(
+                FluentIcons.chevron_down,
+                color: isSelected ? AppColors.primary : AppColors.mutedForeground,
+                size: 14,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -207,8 +216,7 @@ class _MultiSelectDialogState extends State<_MultiSelectDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: AppColors.card,
+    return ContentDialog(
       title: const Text(
         'Selecionar Tags',
         style: TextStyle(color: AppColors.cardForeground, fontSize: 18),
@@ -219,35 +227,54 @@ class _MultiSelectDialogState extends State<_MultiSelectDialog> {
           runSpacing: 8,
           children: BuildFilterBarWidget.availableTags.map((tag) {
             final isSelected = _selectedTags.contains(tag);
-            return FilterChip(
-              label: Text(BuildFilters.translateTag(tag)),
-              selected: isSelected,
-              onSelected: (_) => _toggleTag(tag),
-              selectedColor: AppColors.primary.withValues(alpha: 0.2),
-              checkmarkColor: AppColors.primary,
-              labelStyle: TextStyle(
-                color: isSelected ? AppColors.primary : AppColors.mutedForeground,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-              backgroundColor: AppColors.background,
-              side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.border,
+            return MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () => _toggleTag(tag),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.primary.withValues(alpha: 0.2) : AppColors.background,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : AppColors.border,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isSelected) ...[
+                        const Icon(FluentIcons.check_mark, size: 12, color: AppColors.primary),
+                        const SizedBox(width: 4),
+                      ],
+                      Text(
+                        BuildFilters.translateTag(tag),
+                        style: TextStyle(
+                          color: isSelected ? AppColors.primary : AppColors.mutedForeground,
+                          fontSize: 12,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             );
           }).toList(),
         ),
       ),
       actions: [
-        TextButton(
+        Button(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cancelar', style: TextStyle(color: AppColors.mutedForeground)),
         ),
-        TextButton(
+        FilledButton(
           onPressed: () {
             widget.onApply(_selectedTags);
             Navigator.of(context).pop();
           },
-          child: const Text('Aplicar', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+          child: const Text('Aplicar', style: TextStyle(fontWeight: FontWeight.bold)),
         ),
       ],
     );
@@ -269,38 +296,40 @@ class _MasteryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: AppColors.borderRadius,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : AppColors.card,
-          borderRadius: AppColors.borderRadius,
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
-            width: isSelected ? 1.5 : 1.0,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : AppColors.card,
+            borderRadius: AppColors.borderRadius,
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.border,
+              width: isSelected ? 1.5 : 1.0,
+            ),
           ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 15,
-              color: isSelected ? AppColors.primary : AppColors.mutedForeground,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 15,
                 color: isSelected ? AppColors.primary : AppColors.mutedForeground,
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               ),
-            ),
-          ],
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? AppColors.primary : AppColors.mutedForeground,
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

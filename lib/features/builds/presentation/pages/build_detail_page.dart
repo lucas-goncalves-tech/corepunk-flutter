@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/models/build_guide.dart';
@@ -113,7 +113,7 @@ class BuildDetailPage extends StatelessWidget {
                 ),
               ),
             ),
-            const Divider(height: 1, color: AppColors.border),
+            Container(height: 1, color: AppColors.border),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -193,23 +193,34 @@ class BuildDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final youtubeId = _extractYoutubeId(buildGuide.youtubeLink);
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.card,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.cardForeground),
-        title: const Text(
-          'Detalhes da Build',
-          style: TextStyle(
-            color: AppColors.cardForeground,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+    return ScaffoldPage(
+      padding: EdgeInsets.zero,
+      header: Container(
+        height: 50,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: const BoxDecoration(
+          color: AppColors.card,
+          border: Border(bottom: BorderSide(color: AppColors.border)),
+        ),
+        child: Row(
+          children: [
+            IconButton(
+              icon: const Icon(FluentIcons.back, size: 16, color: AppColors.cardForeground),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Detalhes da Build',
+              style: TextStyle(
+                color: AppColors.cardForeground,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ),
-      body: SingleChildScrollView(
+      content: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,14 +311,14 @@ class BuildDetailPage extends StatelessWidget {
                                         errorBuilder:
                                             (context, error, stackTrace) =>
                                                 const Icon(
-                                                  Icons.shield_outlined,
+                                                  FluentIcons.shield,
                                                   color:
                                                       AppColors.mutedForeground,
                                                 ),
                                       );
                                     }
                                     return const Icon(
-                                      Icons.shield_outlined,
+                                      FluentIcons.shield,
                                       color: AppColors.mutedForeground,
                                     );
                                   },
@@ -415,71 +426,74 @@ class BuildDetailPage extends StatelessWidget {
 
             // Video Banner
             if (youtubeId != null) ...[
-              GestureDetector(
-                onTap: () => _launchYoutube(buildGuide.youtubeLink),
-                child: ClipRRect(
-                  borderRadius: AppColors.borderRadius,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Image.network(
-                        'https://img.youtube.com/vi/$youtubeId/maxresdefault.jpg',
-                        width: double.infinity,
-                        height: 220,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.network(
-                            'https://img.youtube.com/vi/$youtubeId/hqdefault.jpg',
-                            width: double.infinity,
-                            height: 220,
-                            fit: BoxFit.cover,
-                          );
-                        },
-                      ),
-                      Container(
-                        width: double.infinity,
-                        height: 220,
-                        color: Colors.black.withValues(alpha: 0.3),
-                      ),
-                      const Icon(
-                        Icons.play_circle_fill,
-                        color: Color(0xFFFF0000),
-                        size: 72,
-                      ),
-                      Positioned(
-                        bottom: 12,
-                        right: 12,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.7),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.ondemand_video_rounded,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                              SizedBox(width: 6),
-                              Text(
-                                'Assistir no YouTube',
-                                style: TextStyle(
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () => _launchYoutube(buildGuide.youtubeLink),
+                  child: ClipRRect(
+                    borderRadius: AppColors.borderRadius,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Image.network(
+                          'https://img.youtube.com/vi/$youtubeId/maxresdefault.jpg',
+                          width: double.infinity,
+                          height: 220,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.network(
+                              'https://img.youtube.com/vi/$youtubeId/hqdefault.jpg',
+                              width: double.infinity,
+                              height: 220,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        ),
+                        Container(
+                          width: double.infinity,
+                          height: 220,
+                          color: Colors.black.withValues(alpha: 0.3),
+                        ),
+                        const Icon(
+                          FluentIcons.play_solid,
+                          color: Color(0xFFFF0000),
+                          size: 72,
+                        ),
+                        Positioned(
+                          bottom: 12,
+                          right: 12,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.7),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  FluentIcons.video,
                                   color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
+                                  size: 16,
                                 ),
-                              ),
-                            ],
+                                SizedBox(width: 6),
+                                Text(
+                                  'Assistir no YouTube',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

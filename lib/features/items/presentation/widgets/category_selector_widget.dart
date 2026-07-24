@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class CategorySelectorWidget extends StatelessWidget {
@@ -12,17 +12,17 @@ class CategorySelectorWidget extends StatelessWidget {
   });
 
   static const List<Map<String, dynamic>> categories = [
-    {'id': '', 'label': 'Todos', 'icon': Icons.grid_view_rounded},
-    {'id': 'weapon', 'label': 'Armas', 'icon': Icons.sports_kabaddi_rounded},
-    {'id': 'implant', 'label': 'Artefatos', 'icon': Icons.hexagon_outlined},
-    {'id': 'chip', 'label': 'Chips', 'icon': Icons.memory_rounded},
-    {'id': 'rune', 'label': 'Runas', 'icon': Icons.polyline_rounded},
-    {'id': 'consumable', 'label': 'Consumíveis', 'icon': Icons.science_rounded},
-    {'id': 'resource', 'label': 'Recursos', 'icon': Icons.inventory_2_outlined},
-    {'id': 'talent', 'label': 'Talentos', 'icon': Icons.auto_awesome_rounded},
-    {'id': 'skin', 'label': 'Skins', 'icon': Icons.checkroom_rounded},
-    {'id': 'mount', 'label': 'Montarias', 'icon': Icons.pets_rounded},
-    {'id': 'quest-item', 'label': 'Missões', 'icon': Icons.description_rounded},
+    {'id': '', 'label': 'Todos', 'icon': FluentIcons.all_apps},
+    {'id': 'weapon', 'label': 'Armas', 'icon': FluentIcons.shield},
+    {'id': 'implant', 'label': 'Artefatos', 'icon': FluentIcons.diamond_solid},
+    {'id': 'chip', 'label': 'Chips', 'icon': FluentIcons.developer_tools},
+    {'id': 'rune', 'label': 'Runas', 'icon': FluentIcons.color},
+    {'id': 'consumable', 'label': 'Consumíveis', 'icon': FluentIcons.heart},
+    {'id': 'resource', 'label': 'Recursos', 'icon': FluentIcons.archive},
+    {'id': 'talent', 'label': 'Talentos', 'icon': FluentIcons.starburst},
+    {'id': 'skin', 'label': 'Skins', 'icon': FluentIcons.shirt},
+    {'id': 'mount', 'label': 'Montarias', 'icon': FluentIcons.car},
+    {'id': 'quest-item', 'label': 'Missões', 'icon': FluentIcons.clipboard_list},
   ];
 
   @override
@@ -74,38 +74,40 @@ class _CategoryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: AppColors.borderRadius,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : AppColors.card,
-          borderRadius: AppColors.borderRadius,
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
-            width: isSelected ? 1.5 : 1.0,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : AppColors.card,
+            borderRadius: AppColors.borderRadius,
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.border,
+              width: isSelected ? 1.5 : 1.0,
+            ),
           ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 15,
-              color: isSelected ? AppColors.primary : AppColors.mutedForeground,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 15,
                 color: isSelected ? AppColors.primary : AppColors.mutedForeground,
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               ),
-            ),
-          ],
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? AppColors.primary : AppColors.mutedForeground,
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

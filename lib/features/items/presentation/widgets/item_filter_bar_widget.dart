@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class ItemFilterBarWidget extends StatelessWidget {
@@ -132,36 +132,41 @@ class ItemFilterBarWidget extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: TextField(
+                child: TextBox(
                   controller: searchController,
                   onChanged: onSearchChanged,
                   style: const TextStyle(color: AppColors.cardForeground, fontSize: 13),
-                  decoration: InputDecoration(
-                    hintText: 'Buscar item por nome...',
-                    prefixIcon: const Icon(Icons.search_rounded, color: AppColors.mutedForeground, size: 18),
-                    suffixIcon: searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.close_rounded, size: 16, color: AppColors.mutedForeground),
-                            onPressed: () {
-                              searchController.clear();
-                              onSearchChanged('');
-                            },
-                          )
-                        : null,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  placeholder: 'Buscar item por nome...',
+                  prefix: const Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Icon(FluentIcons.search, color: AppColors.mutedForeground, size: 14),
                   ),
+                  suffixMode: OverlayVisibilityMode.editing,
+                  suffix: IconButton(
+                    icon: const Icon(FluentIcons.clear, size: 12, color: AppColors.mutedForeground),
+                    onPressed: () {
+                      searchController.clear();
+                      onSearchChanged('');
+                    },
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 ),
               ),
               if (hasActiveFilters) ...[
                 const SizedBox(width: 8),
-                IconButton(
-                  tooltip: 'Limpar Filtros',
-                  style: IconButton.styleFrom(
-                    backgroundColor: AppColors.destructive.withValues(alpha: 0.15),
-                    side: const BorderSide(color: AppColors.destructive),
+                Tooltip(
+                  message: 'Limpar Filtros',
+                  child: IconButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.all(AppColors.destructive.withValues(alpha: 0.15)),
+                      shape: WidgetStateProperty.all(RoundedRectangleBorder(
+                        side: const BorderSide(color: AppColors.destructive),
+                        borderRadius: BorderRadius.circular(4),
+                      )),
+                    ),
+                    icon: const Icon(FluentIcons.clear_filter, color: AppColors.destructive, size: 16),
+                    onPressed: onResetFilters,
                   ),
-                  icon: const Icon(Icons.filter_alt_off_rounded, color: AppColors.destructive, size: 18),
-                  onPressed: onResetFilters,
                 ),
               ],
             ],
@@ -230,7 +235,7 @@ class ItemFilterBarWidget extends StatelessWidget {
     final isSelected = value.isNotEmpty;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
       decoration: BoxDecoration(
         color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : AppColors.background,
         borderRadius: AppColors.borderRadius,
@@ -239,31 +244,36 @@ class ItemFilterBarWidget extends StatelessWidget {
           width: isSelected ? 1.5 : 1.0,
         ),
       ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isDense: true,
-          dropdownColor: AppColors.popover,
+      child: ComboBox<String>(
+        value: value.isEmpty ? null : value,
+        placeholder: Text(
+          items.firstWhere((e) => e['id'] == '')['label']!,
           style: TextStyle(
             color: isSelected ? AppColors.primary : AppColors.mutedForeground,
             fontSize: 11,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
           ),
-          icon: Icon(
-            Icons.arrow_drop_down_rounded,
-            color: isSelected ? AppColors.primary : AppColors.mutedForeground,
-            size: 18,
-          ),
-          onChanged: (newValue) {
-            if (newValue != null) onChanged(newValue);
-          },
-          items: items.map((item) {
-            return DropdownMenuItem<String>(
-              value: item['id'],
-              child: Text(item['label']!),
-            );
-          }).toList(),
         ),
+        isExpanded: false,
+        style: TextStyle(
+          color: isSelected ? AppColors.primary : AppColors.mutedForeground,
+          fontSize: 11,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+        ),
+        icon: Icon(
+          FluentIcons.chevron_down,
+          color: isSelected ? AppColors.primary : AppColors.mutedForeground,
+          size: 14,
+        ),
+        onChanged: (newValue) {
+          if (newValue != null) onChanged(newValue);
+        },
+        items: items.map((item) {
+          if (item['id'] == '') return null; // We use placeholder for the empty case
+          return ComboBoxItem<String>(
+            value: item['id'],
+            child: Text(item['label']!),
+          );
+        }).whereType<ComboBoxItem<String>>().toList(),
       ),
     );
   }

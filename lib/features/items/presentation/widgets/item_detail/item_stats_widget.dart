@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../data/models/corepunk_item_detail.dart';
 
@@ -60,6 +60,14 @@ class ItemStatsWidget extends StatelessWidget {
     }
   }
 
+  Widget _buildDivider() {
+    return Container(
+      height: 1,
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      color: AppColors.border,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final chipSlots = _chipSlotsCount;
@@ -101,7 +109,7 @@ class ItemStatsWidget extends StatelessWidget {
                       width: 16,
                       height: 16,
                       errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.flash_on_rounded, size: 16, color: AppColors.primary),
+                          const Icon(FluentIcons.lightning_bolt, size: 16, color: AppColors.primary),
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -123,7 +131,7 @@ class ItemStatsWidget extends StatelessWidget {
                 ),
               );
             }),
-            const Divider(height: 20, color: AppColors.border),
+            _buildDivider(),
           ],
           if (chipSlots > 0 && (item.type.toLowerCase() == 'weapon' || item.type.toLowerCase() == 'implant')) ...[
             const Text(
@@ -141,7 +149,7 @@ class ItemStatsWidget extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 4.0),
                 child: Row(
                   children: [
-                    Icon(Icons.memory_rounded, size: 14, color: AppColors.primary),
+                    Icon(FluentIcons.developer_tools, size: 14, color: AppColors.primary),
                     SizedBox(width: 6),
                     Text(
                       'Slot de Chip Básico (Basic chip slot)',
@@ -151,7 +159,7 @@ class ItemStatsWidget extends StatelessWidget {
                 ),
               );
             }),
-            const Divider(height: 20, color: AppColors.border),
+            _buildDivider(),
           ],
           const Text(
             'MODIFICAÇÕES:',
@@ -173,7 +181,7 @@ class ItemStatsWidget extends StatelessWidget {
             style: TextStyle(color: AppColors.mutedForeground, fontSize: 12),
           ),
           if (item.specialEffect != null) ...[
-            const Divider(height: 20, color: AppColors.border),
+            _buildDivider(),
             Text(
               'EFEITO ESPECIAL: ${item.specialEffect!.title.toUpperCase()}',
               style: const TextStyle(
@@ -194,7 +202,7 @@ class ItemStatsWidget extends StatelessWidget {
             ),
           ],
           if (item.description != null && item.description!.isNotEmpty) ...[
-            const Divider(height: 20, color: AppColors.border),
+            _buildDivider(),
             const Text(
               'DESCRIÇÃO / LORE:',
               style: TextStyle(

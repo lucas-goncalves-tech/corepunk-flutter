@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../data/models/corepunk_item_detail.dart';
 
@@ -65,7 +65,10 @@ class ItemDetailHeaderWidget extends StatelessWidget {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: activeBorderColor.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(4),
@@ -101,25 +104,23 @@ class ItemDetailHeaderWidget extends StatelessWidget {
                         child: SizedBox(
                           width: 18,
                           height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppColors.primary,
+                          child: ProgressRing(
+                            strokeWidth: 2.0,
+                            activeColor: AppColors.primary,
                           ),
                         ),
                       )
-                    : IconButton(
-                        icon: const Icon(
-                          Icons.g_translate_rounded,
-                          color: AppColors.primary,
-                          size: 20,
+                    : Tooltip(
+                        message: 'Recarregar Tradução',
+                        child: IconButton(
+                          icon: const Icon(
+                            FluentIcons.locale_language,
+                            color: AppColors.primary,
+                            size: 20,
+                          ),
+                          onPressed: onRefetchTranslation,
                         ),
-                        tooltip: 'Recarregar Tradução',
-                        onPressed: onRefetchTranslation,
                       ),
-              IconButton(
-                icon: const Icon(Icons.close, color: AppColors.mutedForeground),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
             ],
           ),
         ),
@@ -131,7 +132,8 @@ class ItemDetailHeaderWidget extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: qualities.map((q) {
-                final isSelected = q.toLowerCase() == selectedQuality.toLowerCase();
+                final isSelected =
+                    q.toLowerCase() == selectedQuality.toLowerCase();
                 final baseRarityColor = _getBorderColor(q);
 
                 final borderColor = isSelected
@@ -164,7 +166,11 @@ class ItemDetailHeaderWidget extends StatelessWidget {
                         item.getImageUrlForQuality(q),
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.broken_image_rounded, size: 28, color: AppColors.mutedForeground),
+                            const Icon(
+                              FluentIcons.error,
+                              size: 28,
+                              color: AppColors.mutedForeground,
+                            ),
                       ),
                     ),
                   ),
@@ -180,16 +186,16 @@ class ItemDetailHeaderWidget extends StatelessWidget {
             decoration: BoxDecoration(
               color: activeBorderColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: activeBorderColor,
-                width: 2.0,
-              ),
+              border: Border.all(color: activeBorderColor, width: 2.0),
             ),
             child: Image.network(
               item.imageUrl,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image_rounded, size: 36, color: AppColors.mutedForeground),
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                FluentIcons.error,
+                size: 36,
+                color: AppColors.mutedForeground,
+              ),
             ),
           ),
       ],

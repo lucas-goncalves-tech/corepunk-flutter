@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class HeroesPage extends StatelessWidget {
@@ -6,13 +6,13 @@ class HeroesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
+    return const ScaffoldPage(
+      content: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.shield_outlined,
+              FluentIcons.shield,
               size: 48,
               color: AppColors.primary,
             ),

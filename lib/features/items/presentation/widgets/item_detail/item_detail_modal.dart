@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../data/models/corepunk_item.dart';
 import '../../../data/models/corepunk_item_detail.dart';
@@ -12,16 +12,12 @@ import 'item_skin_set_widget.dart';
 class ItemDetailModal extends StatefulWidget {
   final CorepunkItem itemSummary;
 
-  const ItemDetailModal({
-    super.key,
-    required this.itemSummary,
-  });
+  const ItemDetailModal({super.key, required this.itemSummary});
 
   static Future<void> show(BuildContext context, CorepunkItem item) {
-    return showModalBottomSheet(
+    return showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      barrierDismissible: true,
       builder: (context) => ItemDetailModal(itemSummary: item),
     );
   }
@@ -33,6 +29,7 @@ class ItemDetailModal extends StatefulWidget {
 class _ItemDetailModalState extends State<ItemDetailModal> {
   late String _selectedQuality;
   late Future<CorepunkItemDetail> _translationFuture;
+  final ScrollController _scrollController = ScrollController();
 
   bool _isRefetchingTranslation = false;
   DateTime? _lastRefetchTime;
@@ -44,9 +41,18 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
     _initTranslation();
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   void _initTranslation({bool forceRefetch = false}) {
     final rawDetail = _buildRawDetail();
-    _translationFuture = ItemTranslationService.translateItemDetail(rawDetail, forceRefetch: forceRefetch);
+    _translationFuture = ItemTranslationService.translateItemDetail(
+      rawDetail,
+      forceRefetch: forceRefetch,
+    );
   }
 
   void _onQualityChanged(String newQuality) {
@@ -62,12 +68,19 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
       final elapsed = DateTime.now().difference(_lastRefetchTime!).inSeconds;
       if (elapsed < 5) {
         final remaining = 5 - elapsed;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Aguarde $remaining segundo(s) antes de traduzir novamente.'),
-            duration: const Duration(seconds: 2),
-            backgroundColor: AppColors.popover,
-          ),
+        displayInfoBar(
+          context,
+          builder: (context, close) {
+            return InfoBar(
+              title: const Text('Aguarde'),
+              content: Text(
+                'Aguarde $remaining segundo(s) antes de traduzir novamente.',
+              ),
+              severity: InfoBarSeverity.warning,
+              onClose: close,
+            );
+          },
+          duration: const Duration(seconds: 2),
         );
         return;
       }
@@ -87,12 +100,17 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
       setState(() {
         _isRefetchingTranslation = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Tradução recarregada com sucesso!'),
-          duration: Duration(seconds: 2),
-          backgroundColor: AppColors.card,
-        ),
+      displayInfoBar(
+        context,
+        builder: (context, close) {
+          return InfoBar(
+            title: const Text('Sucesso'),
+            content: const Text('Tradução recarregada com sucesso!'),
+            severity: InfoBarSeverity.success,
+            onClose: close,
+          );
+        },
+        duration: const Duration(seconds: 2),
       );
     }
   }
@@ -118,53 +136,101 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
     List<IngredientItem> workbenchIngredients = [];
     if (widget.itemSummary.type == 'weapon') {
       workbenchIngredients = const [
-        IngredientItem(id: 101, name: 'Receita de Armaria', quantity: 1, type: 'consumable', slug: 'recipe-weaponsmithing'),
-        IngredientItem(id: 102, name: 'Lingote Meteórico', quantity: 3, type: 'resource', slug: 'meteoric-ingot'),
-        IngredientItem(id: 103, name: 'Nugget de Titânio', quantity: 1, type: 'resource', slug: 'titanium-nugget'),
-        IngredientItem(id: 104, name: 'Casco Verde', quantity: 1, type: 'resource', slug: 'green-shell'),
+        IngredientItem(
+          id: 101,
+          name: 'Receita de Armaria',
+          quantity: 1,
+          type: 'consumable',
+          slug: 'recipe-weaponsmithing',
+        ),
+        IngredientItem(
+          id: 102,
+          name: 'Lingote Meteórico',
+          quantity: 3,
+          type: 'resource',
+          slug: 'meteoric-ingot',
+        ),
+        IngredientItem(
+          id: 103,
+          name: 'Nugget de Titânio',
+          quantity: 1,
+          type: 'resource',
+          slug: 'titanium-nugget',
+        ),
+        IngredientItem(
+          id: 104,
+          name: 'Casco Verde',
+          quantity: 1,
+          type: 'resource',
+          slug: 'green-shell',
+        ),
       ];
     } else if (widget.itemSummary.type == 'implant') {
       workbenchIngredients = const [
-        IngredientItem(id: 201, name: 'Receita de Construção', quantity: 1, type: 'consumable', slug: 'recipe-construction'),
-        IngredientItem(id: 202, name: 'Mel de Sangue', quantity: 2, type: 'resource', slug: 'blood-honey'),
-        IngredientItem(id: 203, name: 'Líquido de Thermium', quantity: 1, type: 'resource', slug: 'thermium-liquidum'),
+        IngredientItem(
+          id: 201,
+          name: 'Receita de Construção',
+          quantity: 1,
+          type: 'consumable',
+          slug: 'recipe-construction',
+        ),
+        IngredientItem(
+          id: 202,
+          name: 'Mel de Sangue',
+          quantity: 2,
+          type: 'resource',
+          slug: 'blood-honey',
+        ),
+        IngredientItem(
+          id: 203,
+          name: 'Líquido de Thermium',
+          quantity: 1,
+          type: 'resource',
+          slug: 'thermium-liquidum',
+        ),
       ];
     }
 
     final recipes = <CraftRecipeInfo>[];
     if (workbenchIngredients.isNotEmpty) {
-      recipes.add(CraftRecipeInfo(
-        name: 'Bancada (Workbench)',
-        ingredients: workbenchIngredients,
-      ));
+      recipes.add(
+        CraftRecipeInfo(
+          name: 'Bancada (Workbench)',
+          ingredients: workbenchIngredients,
+        ),
+      );
 
-      recipes.add(CraftRecipeInfo(
-        name: 'Melhorado (Upgraded)',
-        ingredients: [
-          ...workbenchIngredients.take(2),
-          const IngredientItem(
-            id: 301,
-            name: 'Kit de Upgrade de Item',
-            quantity: 1,
-            type: 'resource',
-            slug: 'adept-item-upgrade-kit-t1',
-          ),
-        ],
-      ));
+      recipes.add(
+        CraftRecipeInfo(
+          name: 'Melhorado (Upgraded)',
+          ingredients: [
+            ...workbenchIngredients.take(2),
+            const IngredientItem(
+              id: 301,
+              name: 'Kit de Upgrade de Item',
+              quantity: 1,
+              type: 'resource',
+              slug: 'adept-item-upgrade-kit-t1',
+            ),
+          ],
+        ),
+      );
 
-      recipes.add(CraftRecipeInfo(
-        name: 'Overclockado (Overclocked)',
-        ingredients: [
-          ...workbenchIngredients.take(2),
-          const IngredientItem(
-            id: 302,
-            name: 'Kit de Upgrade de Mestre',
-            quantity: 1,
-            type: 'resource',
-            slug: 'master-item-upgrade-kit-t2',
-          ),
-        ],
-      ));
+      recipes.add(
+        CraftRecipeInfo(
+          name: 'Overclockado (Overclocked)',
+          ingredients: [
+            ...workbenchIngredients.take(2),
+            const IngredientItem(
+              id: 302,
+              name: 'Kit de Upgrade de Mestre',
+              quantity: 1,
+              type: 'resource',
+              slug: 'master-item-upgrade-kit-t2',
+            ),
+          ],
+        ),
+      );
     }
 
     return CorepunkItemDetail(
@@ -185,7 +251,9 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
       stats: stats,
       workbenchIngredients: workbenchIngredients,
       synthesisRecipes: recipes,
-      specialEffect: (widget.itemSummary.descriptionEffect != null && widget.itemSummary.descriptionEffect!.isNotEmpty)
+      specialEffect:
+          (widget.itemSummary.descriptionEffect != null &&
+              widget.itemSummary.descriptionEffect!.isNotEmpty)
           ? SpecialEffectInfo(
               id: 99,
               title: 'Chance On-hit',
@@ -198,122 +266,111 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
   @override
   Widget build(BuildContext context) {
     final rawDetail = _buildRawDetail();
-    final keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
 
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: EdgeInsets.only(bottom: keyboardPadding),
-        child: DraggableScrollableSheet(
-          initialChildSize: 0.85,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          builder: (context, scrollController) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    return ContentDialog(
+      constraints: const BoxConstraints(maxWidth: 600, maxHeight: 800),
+      title: null,
+      content: FutureBuilder<CorepunkItemDetail>(
+        future: _translationFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return _buildGlassmorphismLoader();
+          }
+
+          final translatedBase = snapshot.data ?? rawDetail;
+          final detail = CorepunkItemDetail(
+            id: translatedBase.id,
+            name: translatedBase.name,
+            slug: translatedBase.slug,
+            quality: _selectedQuality,
+            type: translatedBase.type,
+            tier: translatedBase.tier,
+            level: translatedBase.level,
+            upgradable: translatedBase.upgradable,
+            profession: translatedBase.profession,
+            professionLevel: translatedBase.professionLevel,
+            description: translatedBase.description,
+            descriptionEffect: translatedBase.descriptionEffect,
+            archetype: translatedBase.archetype ?? widget.itemSummary.archetype,
+            sex: translatedBase.sex ?? widget.itemSummary.sex,
+            slot: translatedBase.slot ?? widget.itemSummary.slot,
+            stats: translatedBase.stats,
+            workbenchIngredients: translatedBase.workbenchIngredients,
+            synthesisRecipes: translatedBase.synthesisRecipes,
+            specialEffect: translatedBase.specialEffect,
+          );
+
+          return Column(
+            children: [
+              ItemDetailHeaderWidget(
+                item: detail,
+                selectedQuality: _selectedQuality,
+                onQualitySelected: _onQualityChanged,
+                onRefetchTranslation: _handleManualRefetchTranslation,
+                isRefetching: _isRefetchingTranslation,
               ),
-              child: FutureBuilder<CorepunkItemDetail>(
-                future: _translationFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return _buildGlassmorphismLoader();
-                  }
-
-                  final translatedBase = snapshot.data ?? rawDetail;
-                  final detail = CorepunkItemDetail(
-                    id: translatedBase.id,
-                    name: translatedBase.name,
-                    slug: translatedBase.slug,
-                    quality: _selectedQuality,
-                    type: translatedBase.type,
-                    tier: translatedBase.tier,
-                    level: translatedBase.level,
-                    upgradable: translatedBase.upgradable,
-                    profession: translatedBase.profession,
-                    professionLevel: translatedBase.professionLevel,
-                    description: translatedBase.description,
-                    descriptionEffect: translatedBase.descriptionEffect,
-                    archetype: translatedBase.archetype ?? widget.itemSummary.archetype,
-                    sex: translatedBase.sex ?? widget.itemSummary.sex,
-                    slot: translatedBase.slot ?? widget.itemSummary.slot,
-                    stats: translatedBase.stats,
-                    workbenchIngredients: translatedBase.workbenchIngredients,
-                    synthesisRecipes: translatedBase.synthesisRecipes,
-                    specialEffect: translatedBase.specialEffect,
-                  );
-
-                  return Column(
-                    children: [
+              Expanded(
+                child: ListView(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.only(top: 16.0),
+                  children: [
+                    if (detail.type == 'skin') ItemSkinSetWidget(item: detail),
+                    if (detail.type != 'skin' &&
+                        (detail.stats.isNotEmpty ||
+                            detail.specialEffect != null ||
+                            (detail.description != null &&
+                                detail.description!.isNotEmpty)))
+                      ItemStatsWidget(item: detail),
+                    if (detail.workbenchIngredients.isNotEmpty &&
+                        detail.type != 'skin')
+                      ItemCraftingCalculatorWidget(item: detail),
+                    if (detail.profession != null &&
+                        detail.profession!.isNotEmpty) ...[
                       Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        width: 40,
-                        height: 4,
+                        margin: const EdgeInsets.symmetric(vertical: 8.0),
+                        padding: const EdgeInsets.all(16.0),
                         decoration: BoxDecoration(
-                          color: AppColors.border,
-                          borderRadius: BorderRadius.circular(2),
+                          color: AppColors.card,
+                          borderRadius: AppColors.borderRadius,
+                          border: Border.all(color: AppColors.border),
                         ),
-                      ),
-                      ItemDetailHeaderWidget(
-                        item: detail,
-                        selectedQuality: _selectedQuality,
-                        onQualitySelected: _onQualityChanged,
-                        onRefetchTranslation: _handleManualRefetchTranslation,
-                        isRefetching: _isRefetchingTranslation,
-                      ),
-                      Expanded(
-                        child: ListView(
-                          controller: scrollController,
-                          padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (detail.type == 'skin') ItemSkinSetWidget(item: detail),
-                            if (detail.type != 'skin' && (detail.stats.isNotEmpty || detail.specialEffect != null || (detail.description != null && detail.description!.isNotEmpty)))
-                              ItemStatsWidget(item: detail),
-                            if (detail.workbenchIngredients.isNotEmpty && detail.type != 'skin')
-                              ItemCraftingCalculatorWidget(item: detail),
-                            if (detail.profession != null && detail.profession!.isNotEmpty) ...[
-                              Container(
-                                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                                padding: const EdgeInsets.all(16.0),
-                                decoration: BoxDecoration(
-                                  color: AppColors.card,
-                                  borderRadius: AppColors.borderRadius,
-                                  border: Border.all(color: AppColors.border),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'PROFISSÃO:',
-                                      style: TextStyle(
-                                        color: AppColors.primary,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      'Especialização: ${detail.profession!}',
-                                      style: const TextStyle(color: AppColors.cardForeground, fontSize: 12),
-                                    ),
-                                  ],
-                                ),
+                            const Text(
+                              'PROFISSÃO:',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
                               ),
-                            ],
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Especialização: ${detail.profession!}',
+                              style: const TextStyle(
+                                color: AppColors.cardForeground,
+                                fontSize: 12,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ],
-                  );
-                },
+                  ],
+                ),
               ),
-            );
-          },
-        ),
+            ],
+          );
+        },
       ),
+      actions: [
+        Button(
+          child: const Text('Fechar'),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
     );
   }
 
@@ -336,10 +393,7 @@ class _ItemDetailModalState extends State<ItemDetailModal> {
             child: const Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(
-                  color: AppColors.primary,
-                  strokeWidth: 3,
-                ),
+                ProgressRing(activeColor: AppColors.primary, strokeWidth: 3),
                 SizedBox(height: 16),
                 Text(
                   'Traduzindo dados do item...',
